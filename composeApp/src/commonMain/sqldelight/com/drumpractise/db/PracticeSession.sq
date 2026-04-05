@@ -1,0 +1,10 @@
+CREATE TABLE practice_session (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  created_at INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM practice_session ORDER BY id DESC;
+
+insert:
+INSERT INTO practice_session(created_at) VALUES (?);

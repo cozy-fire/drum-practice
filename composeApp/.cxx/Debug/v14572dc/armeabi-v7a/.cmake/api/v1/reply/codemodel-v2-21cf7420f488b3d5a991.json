@@ -1,0 +1,113 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "verovio_build",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-verovio_build-Debug-29bfd3c8e6cb53bcbb22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "D:/CodeProject/DrumPractise/external/verovio/cmake",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "verovio-android",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "Verovio",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "headers::@88ab067015c8146ae133",
+					"jsonFile" : "target-headers-Debug-6e8a6c3448c9d1322163.json",
+					"name" : "headers",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "verovio::@88ab067015c8146ae133",
+					"jsonFile" : "target-verovio-Debug-0a7ce3af5fc3b5413a56.json",
+					"name" : "verovio",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "verovio-android::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-verovio-android-Debug-0b638a12e93f07d06d16.json",
+					"name" : "verovio-android",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/armeabi-v7a",
+		"source" : "D:/CodeProject/DrumPractise/composeApp/src/androidMain/cpp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

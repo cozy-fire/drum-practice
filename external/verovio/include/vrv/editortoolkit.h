@@ -1,0 +1,63 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        editortoolkit.h
+// Author:      Laurent Pugin, Juliette Regimbal
+// Created:     16/05/2018
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef __VRV_EDITOR_TOOLKIT_H__
+#define __VRV_EDITOR_TOOLKIT_H__
+
+#include <cmath>
+#include <string>
+#include <utility>
+
+//--------------------------------------------------------------------------------
+
+#include "doc.h"
+#include "view.h"
+
+#include "jsonxx.h"
+
+namespace vrv {
+
+//--------------------------------------------------------------------------------
+// EditorToolkit
+//--------------------------------------------------------------------------------
+
+class EditorToolkit {
+public:
+    EditorToolkit(Doc *doc, View *view)
+    {
+        m_doc = doc;
+        m_view = view;
+        m_editInfo.reset();
+    }
+    virtual ~EditorToolkit() {}
+
+    /**
+     * In child classes, this parses the provided editor action and then performs the correct action.
+     */
+    virtual bool ParseEditorAction(const std::string &json_editorAction) = 0;
+    /**
+     * Get information on the last editor function used
+     */
+    virtual std::string EditInfo() { return m_editInfo.json(); }
+
+#ifndef NO_EDIT_SUPPORT
+protected:
+    bool AppendChild(const std::string &elementId, const std::string &elementName);
+    bool InsertBefore(const std::string &elementId, const std::string &elementName);
+    bool InsertAfter(const std::string &elementId, const std::string &elementName);
+    Object *GetElement(const std::string &elementId);
+    Object *PrepareInsertion(Object *parent, const std::string &elementName);
+#endif
+
+protected:
+    Doc *m_doc;
+    View *m_view;
+    jsonxx::Object m_editInfo;
+};
+} // namespace vrv
+
+#endif

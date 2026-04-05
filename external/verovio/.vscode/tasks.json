@@ -1,0 +1,46 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+        {
+          "label": "prepare_build",
+          "type": "shell",
+          "command": "mkdir -p ${workspaceFolder}/build",
+          "problemMatcher": [],
+        },
+		{
+			"label": "cmake",
+			"type": "shell",
+			"options": {
+				"cwd": "${workspaceRoot}/build"
+			},
+			"dependsOn": [
+				"prepare_build"
+			],
+			"command": "cmake",
+			"args": [
+				"${workspaceRoot}/cmake"
+			]
+		},
+		{
+			"label": "make",
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"--jobs=8"
+			],
+			"options": {
+				"cwd": "${workspaceRoot}/build"
+			},
+			"dependsOn": [
+				"cmake"
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+	]
+}

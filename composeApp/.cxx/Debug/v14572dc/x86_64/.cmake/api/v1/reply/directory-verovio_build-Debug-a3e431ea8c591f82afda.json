@@ -1,0 +1,64 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"D:/CodeProject/DrumPractise/external/verovio/cmake/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 271,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 281,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"D:/CodeProject/DrumPractise/composeApp/build/intermediates/cxx/Debug/v14572dc/obj/x86_64/libverovio.so"
+			],
+			"targetId" : "verovio::@88ab067015c8146ae133",
+			"targetIndex" : 1,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "share/verovio",
+			"paths" : 
+			[
+				{
+					"from" : "D:/CodeProject/DrumPractise/external/verovio/cmake/../data",
+					"to" : "."
+				}
+			],
+			"type" : "directory"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "verovio_build",
+		"source" : "D:/CodeProject/DrumPractise/external/verovio/cmake"
+	}
+}

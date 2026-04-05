@@ -1,0 +1,104 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "Verovio",
+  "name": "Verovio",
+  "description": "Verovio is a fast, portable and lightweight open-source library for engraving Music Encoding Initiative (MEI) music scores into SVG.",
+  "softwareVersion": "6.0.1",
+  "datePublished": "2026-01-29",
+  "license": "https://www.gnu.org/licenses/lgpl-3.0",
+  "programmingLanguage": [{
+    "@type": "ComputerLanguage",
+    "identifier": "c++",
+    "name": "C++"
+  },
+  {
+    "@type": "ComputerLanguage",
+    "identifier": "js",
+    "name": "JavaScript"
+  },
+  {
+    "@type": "ComputerLanguage",
+    "identifier": "python",
+    "name": "Python"
+  },
+  {
+    "@type": "ComputerLanguage",
+    "identifier": "java",
+    "name": "Java"
+  }
+  ],
+  "codeRepository": "https://github.com/rism-digital/verovio",
+  "issueTracker": "https://github.com/rism-digital/verovio/issues",
+  "dateCreated": "2014-01-09T09:44:10Z",
+  "author": [{
+    "@id": "https://orcid.org/0000-0002-9525-4331",
+    "@type": "Person",
+    "givenName": "Laurent",
+    "familyName": "Pugin"
+  }],
+  "contributor": [{
+      "@id": "https://orcid.org/0000-0003-1898-2543",
+      "@type": "Person",
+      "givenName": "Klaus",
+      "familyName": "Rettinghaus"
+    },
+    {
+      "@id": "https://orcid.org/0000-0002-1722-0718",
+      "@type": "Person",
+      "givenName": "Werner",
+      "familyName": "Goebl"
+    },
+    {
+      "@id": "https://orcid.org/0000-0001-8865-3177",
+      "@type": "Person",
+      "givenName": "Craig",
+      "familyName": "Sapp"
+    },
+    {
+      "@id": "https://orcid.org/0000-0003-2663-0003",
+      "@type": "Person",
+      "givenName": "Andrew",
+      "familyName": "Hankinson"
+    },
+    {
+      "@id": "https://orcid.org/0000-0002-0744-5374",
+      "@type": "Person",
+      "givenName": "Stefan",
+      "familyName": "Münnich"
+    },
+    {
+      "@id": "https://orcid.org/0000-0003-3448-2688",
+      "@type": "Person",
+      "givenName": "David",
+      "familyName": "Rizo"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Thomas",
+      "familyName": "Weber"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Zach",
+      "familyName": "DeCook"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Andrew",
+      "familyName": "Horwitz"
+    },
+    {
+      "@id": "https://orcid.org/0000-0003-4902-046X",
+      "@type": "Person",
+      "givenName": "Juliette",
+      "familyName": "Regimbal"
+    },
+    {
+      "@id": "https://orcid.org/0000-0001-5523-2085",
+      "@type": "Person",
+      "givenName": "Simon",
+      "familyName": "Waloschek"
+    }
+  ]
+}

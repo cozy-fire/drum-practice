@@ -1,0 +1,15 @@
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/CMakeFiles/verovio-android.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/CMakeFiles/edit_cache.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/CMakeFiles/rebuild_cache.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/CMakeFiles/list_install_components.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/CMakeFiles/install.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/CMakeFiles/install/local.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/CMakeFiles/install/strip.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/verovio_build/CMakeFiles/headers.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/verovio_build/CMakeFiles/verovio.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/verovio_build/CMakeFiles/edit_cache.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/verovio_build/CMakeFiles/rebuild_cache.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/verovio_build/CMakeFiles/list_install_components.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/verovio_build/CMakeFiles/install.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/verovio_build/CMakeFiles/install/local.dir
+D:/CodeProject/DrumPractise/composeApp/.cxx/Debug/v14572dc/x86_64/verovio_build/CMakeFiles/install/strip.dir

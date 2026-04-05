@@ -1,0 +1,5 @@
+{
+  "name": "drum-practice-webassets",
+  "private": true,
+  "description": "Optional front-end build assets (unused by Gradle)."
+}

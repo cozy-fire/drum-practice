@@ -1,0 +1,20 @@
+version: 1.0.{build}
+
+branches:
+  only:
+    - develop
+
+image: Visual Studio 2022
+
+configuration: Release
+
+platform: x64
+
+before_build:
+  - cmd: |
+      cd tools
+      cmake -DCMAKE_GENERATOR_PLATFORM=x64 ../cmake
+
+build:
+  project: tools/Verovio.sln
+  verbosity: minimal

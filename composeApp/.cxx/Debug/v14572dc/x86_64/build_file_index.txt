@@ -1,0 +1,2 @@
+D:\CodeProject\DrumPractise\composeApp\src\androidMain\cpp\CMakeLists.txt
+D:\CodeProject\DrumPractise\external\verovio\cmake\CMakeLists.txt

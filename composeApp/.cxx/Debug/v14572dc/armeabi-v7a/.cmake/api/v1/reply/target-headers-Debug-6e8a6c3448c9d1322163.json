@@ -1,0 +1,1654 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target"
+		],
+		"files" : 
+		[
+			"D:/CodeProject/DrumPractise/external/verovio/cmake/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 176,
+				"parent" : 0
+			}
+		]
+	},
+	"id" : "headers::@88ab067015c8146ae133",
+	"name" : "headers",
+	"paths" : 
+	{
+		"build" : "verovio_build",
+		"source" : "D:/CodeProject/DrumPractise/external/verovio/cmake"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35,
+				36,
+				37,
+				38,
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
+				45,
+				46,
+				47,
+				48,
+				49,
+				50,
+				51,
+				52,
+				53,
+				54,
+				55,
+				56,
+				57,
+				58,
+				59,
+				60,
+				61,
+				62,
+				63,
+				64,
+				65,
+				66,
+				67,
+				68,
+				69,
+				70,
+				71,
+				72,
+				73,
+				74,
+				75,
+				76,
+				77,
+				78,
+				79,
+				80,
+				81,
+				82,
+				83,
+				84,
+				85,
+				86,
+				87,
+				88,
+				89,
+				90,
+				91,
+				92,
+				93,
+				94,
+				95,
+				96,
+				97,
+				98,
+				99,
+				100,
+				101,
+				102,
+				103,
+				104,
+				105,
+				106,
+				107,
+				108,
+				109,
+				110,
+				111,
+				112,
+				113,
+				114,
+				115,
+				116,
+				117,
+				118,
+				119,
+				120,
+				121,
+				122,
+				123,
+				124,
+				125,
+				126,
+				127,
+				128,
+				129,
+				130,
+				131,
+				132,
+				133,
+				134,
+				135,
+				136,
+				137,
+				138,
+				139,
+				140,
+				141,
+				142,
+				143,
+				144,
+				145,
+				146,
+				147,
+				148,
+				149,
+				150,
+				151,
+				152,
+				153,
+				154,
+				155,
+				156,
+				157,
+				158,
+				159,
+				160,
+				161,
+				162,
+				163,
+				164,
+				165,
+				166,
+				167,
+				168,
+				169,
+				170,
+				171,
+				172,
+				173,
+				174,
+				175,
+				176,
+				177,
+				178,
+				179,
+				180,
+				181,
+				182,
+				183,
+				184,
+				185,
+				186,
+				187,
+				188,
+				189,
+				190,
+				191,
+				192,
+				193,
+				194,
+				195,
+				196,
+				197,
+				198,
+				199,
+				200,
+				201,
+				202,
+				203,
+				204,
+				205,
+				206,
+				207,
+				208,
+				209,
+				210,
+				211,
+				212,
+				213,
+				214,
+				215,
+				216,
+				217,
+				218,
+				219,
+				220,
+				221,
+				222,
+				223,
+				224,
+				225,
+				226,
+				227,
+				228,
+				229,
+				230,
+				231,
+				232,
+				233,
+				234,
+				235,
+				236,
+				237,
+				238,
+				239,
+				240,
+				241,
+				242,
+				243,
+				244,
+				245,
+				246,
+				247,
+				248,
+				249,
+				250,
+				251,
+				252,
+				253,
+				254,
+				255,
+				256,
+				257,
+				258,
+				259,
+				260,
+				261,
+				262,
+				263,
+				264,
+				265,
+				266,
+				267
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/crc/crc.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/hum/humlib.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/json/jsonxx.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/midi/Binasc.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/midi/MidiEvent.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/midi/MidiEventList.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/midi/MidiFile.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/midi/MidiMessage.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/abbr.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/accid.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/add.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustaccidxfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustarpegfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustarticfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustbeamsfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustclefchangesfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustdotsfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustfloatingpositionerfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustgracexposfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustharmgrpsspacingfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustlayersfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustneumexfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustossiastaffdeffunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustslursfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjuststaffoverlapfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustsylspacingfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjusttempofunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjusttupletsxfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjusttupletsyfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustxoverflowfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustxposfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustxrelfortranscriptionfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustyposfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/adjustyrelfortranscriptionfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/alignfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/altsyminterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/anchoredtext.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/annot.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/annotscore.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/app.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/areaposinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/arpeg.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/artic.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/barline.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/bboxdevicecontext.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/beam.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/beamspan.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/beatrpt.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/boundingbox.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/bracketspan.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/breath.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/btrem.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/cachehorizontallayoutfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/caesura.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcalignmentpitchposfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcalignmentxposfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcarticfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcbboxoverflowsfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcchordnoteheadsfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcdotsfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcledgerlinesfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcligatureorneumeposfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcslurdirectionfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcspanningbeamspansfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/calcstemfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/castofffunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/choice.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/chord.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/clef.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/comparison.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/controlelement.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/convertfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/corr.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/course.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/cpmark.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/custos.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/damage.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/del.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/devicecontext.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/devicecontextbase.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/dir.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/div.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/divline.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/doc.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/docselection.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/dot.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/drawinginterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/durationinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/dynam.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/editfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/editorial.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/editortoolkit.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/editortoolkit_cmn.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/editortoolkit_mensural.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/editortoolkit_neume.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/elementpart.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/ending.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/expan.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/expansion.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/expansionmap.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/f.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/facsimile.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/facsimilefunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/facsimileinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/fb.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/featureextractor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/fermata.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/fig.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/filereader.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/findfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/findlayerelementsfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/fing.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/floatingobject.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/fraction.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/ftrem.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/functor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/functorinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/genericlayerelement.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/git_commit.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/gliss.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/glyph.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/gracegrp.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/graphic.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/grpsym.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/hairpin.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/halfmrpt.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/harm.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/horizontalaligner.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/instrdef.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/interface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/ioabc.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/iobase.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/iocmme.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/iodarms.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/iohumdrum.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/iomei.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/iomusxml.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/iopae.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/iovolpiano.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/justifyfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/keyaccid.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/keysig.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/label.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/labelabbr.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/layer.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/layerdef.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/layerelement.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/lb.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/lem.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/libmei.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/ligature.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/linkinginterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/liquescent.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/lv.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/mdiv.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/measure.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/mensur.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/metersig.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/metersiggrp.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/midifunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/miscfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/mnum.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/mordent.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/mrest.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/mrpt.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/mrpt2.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/mspace.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/multirest.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/multirpt.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/nc.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/neume.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/note.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/num.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/object.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/octave.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/offsetinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/options.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/orig.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/oriscus.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/ornam.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/ossia.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/page.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/pageelement.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/pagemilestone.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/pages.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/pb.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/pedal.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/pgfoot.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/pghead.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/phrase.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/pitchinflection.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/pitchinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/plica.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/plistinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/positioninterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/preparedatafunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/proport.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/quilisma.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/rdg.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/ref.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/reg.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/reh.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/rend.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/repeatmark.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/resetfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/resources.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/rest.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/restore.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/runningelement.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/runtimeclock.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/savefunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/sb.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/score.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/scoredef.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/scoredefinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/scoringupfunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/section.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/setscoredeffunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/sic.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/slur.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/smufl.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/space.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/staff.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/staffdef.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/staffgrp.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/stem.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/subst.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/supplied.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/surface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/svg.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/svgdevicecontext.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/syl.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/syllable.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/symbol.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/symboldef.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/symboltable.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/system.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/systemelement.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/systemmilestone.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/tabdursym.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/tabgrp.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/tempo.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/text.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/textdirinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/textelement.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/textlayoutelement.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/tie.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/timeinterface.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/timemap.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/timestamp.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/toolkit.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/toolkitdef.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/transposefunctor.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/transposition.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/trill.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/tuning.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/tuplet.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/turn.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/unclear.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/verse.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/verticalaligner.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/view.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/vrv.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/vrvdef.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/vrv/zone.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/win32/win_dirent.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/win32/win_getopt.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "D:/CodeProject/DrumPractise/external/verovio/include/win32/win_time.h",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "UTILITY"
+}

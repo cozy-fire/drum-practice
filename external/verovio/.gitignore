@@ -1,0 +1,102 @@
+# xcode
+Verovio.xcodeproj
+Verovio.xccheckout
+Verovio.xcodeproj/project.xcworkspace/xcshareddata
+Verovio.xcodeproj/project.xcworkspace/xcuserdata
+Verovio.xcodeproj/xcuserdata/
+bin/
+
+# Qt Creator
+tools/CMakeLists.txt.user
+build-tools-*
+
+# doc generated file
+doc/pae-tests.html
+
+# include file generated at compilation
+include/vrv/git_commit.h
+bindings/iOS/all.h
+
+# cmake build
+tools/CMakeCache.txt
+tools/CMakeFiles/
+tools/Makefile
+tools/cmake_install.cmake
+tools/install_manifest.txt
+tools/verovio
+tools/build-library
+tools/libverovio.dylib
+tools/libverovio.so
+
+# emscripten build
+emscripten/data/
+emscripten/build/
+emscripten/CMakeFiles/
+emscripten/CMakeCache.txt
+
+# python build
+bindings/python/verovio_wrap.cpp
+bindings/python/verovio.pyc
+bindings/python/verovio.py
+bindings/python/_verovio*.so
+bindings/python/__pycache__/*
+bindings/python/CMakeCache.txt
+bindings/python/CMakeFiles/
+build
+verovio.egg-info
+/dist
+
+# java build
+bindings/java/verovio_wrap.cxx
+bindings/java/main.class
+bindings/java/src/
+bindings/java/target/
+main.class
+leipzig-5.2.log
+leipzig-5.2_data.ly
+
+# Qt build
+bindings/qt/build-verovio-qt-*
+bindings/qt/build-library
+bindings/qt/build-demo
+*.pro.user
+
+# Android build
+bindings/android/obj
+bindings/android/libs
+bindings/qt/build-android
+
+# MacOS
+.DS_Store
+
+# Output files
+output.svg
+output.mei
+emscripten/npm-dev/node_modules
+
+# VS Code files
+.vscode/settings.json
+main
+DerivedData
+verovio.wasm
+Makefile
+libverovio.bc
+cmake_install.cmake
+libverovio.a
+tools/.cmake
+tools/compile_commands.json
+
+# VS Studio files
+.vs/
+Debug/
+Release/
+*.vcxproj*
+*.sln
+
+# IntelliJ files
+.idea
+
+# Intermediate font files
+fonts/**/tmp
+libmei/tools/__pycache__
+doc/.venv
