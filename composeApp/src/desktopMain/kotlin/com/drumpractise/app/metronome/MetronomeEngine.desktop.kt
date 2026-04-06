@@ -82,54 +82,6 @@ actual class MetronomeEngine actual constructor() {
     private fun playBeep(preset: MetronomeSoundPreset, tier: MetronomeAccent) {
         val freq =
             when (preset) {
-                MetronomeSoundPreset.ClickWood ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> 880.0
-                        MetronomeAccent.Medium -> 660.0
-                        MetronomeAccent.Weak -> 440.0
-                    }
-                MetronomeSoundPreset.BeepHigh ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> 1200.0
-                        MetronomeAccent.Medium -> 1050.0
-                        MetronomeAccent.Weak -> 900.0
-                    }
-                MetronomeSoundPreset.BeepLow ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> 400.0
-                        MetronomeAccent.Medium -> 350.0
-                        MetronomeAccent.Weak -> 300.0
-                    }
-                MetronomeSoundPreset.Digital ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> 1000.0
-                        MetronomeAccent.Medium -> 800.0
-                        MetronomeAccent.Weak -> 600.0
-                    }
-                MetronomeSoundPreset.Bell ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> 660.0
-                        MetronomeAccent.Medium -> 590.0
-                        MetronomeAccent.Weak -> 520.0
-                    }
-                MetronomeSoundPreset.SharpClick ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> 1500.0
-                        MetronomeAccent.Medium -> 1300.0
-                        MetronomeAccent.Weak -> 1100.0
-                    }
-                MetronomeSoundPreset.WoodKnock ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> 480.0
-                        MetronomeAccent.Medium -> 400.0
-                        MetronomeAccent.Weak -> 320.0
-                    }
-                MetronomeSoundPreset.SoftTick ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> 720.0
-                        MetronomeAccent.Medium -> 630.0
-                        MetronomeAccent.Weak -> 540.0
-                    }
                 MetronomeSoundPreset.Tr707 ->
                     when (tier) {
                         MetronomeAccent.Strong -> 920.0

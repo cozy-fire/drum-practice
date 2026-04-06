@@ -263,60 +263,11 @@ actual class MetronomeEngine actual constructor() {
             builder.setFlags(AudioAttributes.FLAG_LOW_LATENCY)
         }
 
-        @Suppress("CyclomaticComplexMethod")
         private fun rawResId(
             preset: MetronomeSoundPreset,
             tier: MetronomeAccent,
         ): Int =
             when (preset) {
-                MetronomeSoundPreset.ClickWood ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> R.raw.clickwood_strong
-                        MetronomeAccent.Medium -> R.raw.clickwood_medium
-                        MetronomeAccent.Weak -> R.raw.clickwood_weak
-                    }
-                MetronomeSoundPreset.BeepHigh ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> R.raw.beephigh_strong
-                        MetronomeAccent.Medium -> R.raw.beephigh_medium
-                        MetronomeAccent.Weak -> R.raw.beephigh_weak
-                    }
-                MetronomeSoundPreset.BeepLow ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> R.raw.beeplow_strong
-                        MetronomeAccent.Medium -> R.raw.beeplow_medium
-                        MetronomeAccent.Weak -> R.raw.beeplow_weak
-                    }
-                MetronomeSoundPreset.Digital ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> R.raw.digital_strong
-                        MetronomeAccent.Medium -> R.raw.digital_medium
-                        MetronomeAccent.Weak -> R.raw.digital_weak
-                    }
-                MetronomeSoundPreset.Bell ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> R.raw.bell_strong
-                        MetronomeAccent.Medium -> R.raw.bell_medium
-                        MetronomeAccent.Weak -> R.raw.bell_weak
-                    }
-                MetronomeSoundPreset.SharpClick ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> R.raw.sharpclick_strong
-                        MetronomeAccent.Medium -> R.raw.sharpclick_medium
-                        MetronomeAccent.Weak -> R.raw.sharpclick_weak
-                    }
-                MetronomeSoundPreset.WoodKnock ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> R.raw.woodknock_strong
-                        MetronomeAccent.Medium -> R.raw.woodknock_medium
-                        MetronomeAccent.Weak -> R.raw.woodknock_weak
-                    }
-                MetronomeSoundPreset.SoftTick ->
-                    when (tier) {
-                        MetronomeAccent.Strong -> R.raw.softtick_strong
-                        MetronomeAccent.Medium -> R.raw.softtick_medium
-                        MetronomeAccent.Weak -> R.raw.softtick_weak
-                    }
                 MetronomeSoundPreset.Tr707 ->
                     when (tier) {
                         MetronomeAccent.Strong -> R.raw.tr707_strong

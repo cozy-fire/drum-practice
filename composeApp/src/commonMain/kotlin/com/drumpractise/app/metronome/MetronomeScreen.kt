@@ -37,12 +37,18 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,6 +68,8 @@ import com.drumpractise.app.theme.DrumAccentBeat
 import kotlin.math.atan2
 import kotlin.math.roundToInt
 
+private const val BPM_DIAL_COMMIT_DEBOUNCE_MS = 500L
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MetronomeScreen(
@@ -71,8 +79,20 @@ fun MetronomeScreen(
     val engine = LocalMetronomeEngine.current
 
     var bpm by remember { mutableIntStateOf(110) }
+    /** 圆环拖动时的预览值；null 表示未在拖动预览，界面显示已提交 [bpm]。 */
+    var dialPreviewBpm by remember { mutableStateOf<Int?>(null) }
+    var commitJob by remember { mutableStateOf<Job?>(null) }
+    val scope = rememberCoroutineScope()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            commitJob?.cancel()
+            commitJob = null
+        }
+    }
+
     var noteDivisor by remember { mutableIntStateOf(1) }
-    var preset by remember { mutableStateOf(MetronomeSoundPreset.ClickWood) }
+    var preset by remember { mutableStateOf(MetronomeSoundPreset.Tr707) }
     var playing by remember { mutableStateOf(false) }
     var currentIndexInPeriod by remember { mutableIntStateOf(0) }
 
@@ -118,9 +138,27 @@ fun MetronomeScreen(
         ) {
             Spacer(Modifier.height(8.dp))
             BpmDial(
-                bpm = bpm,
-                onBpmChange = { bpm = it.coerceIn(10, 300) },
+                displayBpm = dialPreviewBpm ?: bpm,
+                onDialPreviewChange = { dialPreviewBpm = it.coerceIn(10, 300) },
+                onRingDragStart = {
+                    commitJob?.cancel()
+                    commitJob = null
+                },
+                onRingDragEnd = {
+                    commitJob?.cancel()
+                    commitJob =
+                        scope.launch {
+                            delay(BPM_DIAL_COMMIT_DEBOUNCE_MS)
+                            val v = (dialPreviewBpm ?: bpm).coerceIn(10, 300)
+                            bpm = v
+                            dialPreviewBpm = null
+                            commitJob = null
+                        }
+                },
                 onBpmClick = {
+                    commitJob?.cancel()
+                    commitJob = null
+                    dialPreviewBpm = null
                     bpmDraft = bpm.toString()
                     bpmDialogOpen = true
                 },
@@ -228,8 +266,11 @@ fun MetronomeScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
+                        commitJob?.cancel()
+                        commitJob = null
                         val v = bpmDraft.toIntOrNull()?.coerceIn(10, 300) ?: bpm
                         bpm = v
+                        dialPreviewBpm = null
                         bpmDialogOpen = false
                     },
                 ) {
@@ -248,14 +289,6 @@ fun MetronomeScreen(
 @Composable
 private fun presetLabel(p: MetronomeSoundPreset): String =
     when (p) {
-        MetronomeSoundPreset.ClickWood -> "木鱼"
-        MetronomeSoundPreset.BeepHigh -> "高音"
-        MetronomeSoundPreset.BeepLow -> "低音"
-        MetronomeSoundPreset.Digital -> "电子"
-        MetronomeSoundPreset.Bell -> "铃声"
-        MetronomeSoundPreset.SharpClick -> "脆击"
-        MetronomeSoundPreset.WoodKnock -> "木击"
-        MetronomeSoundPreset.SoftTick -> "轻嗒"
         MetronomeSoundPreset.Tr707 -> "TR-707"
     }
 
@@ -308,27 +341,37 @@ private fun NoteChoice(
 
 @Composable
 private fun BpmDial(
-    bpm: Int,
-    onBpmChange: (Int) -> Unit,
+    displayBpm: Int,
+    onDialPreviewChange: (Int) -> Unit,
+    onRingDragStart: () -> Unit,
+    onRingDragEnd: () -> Unit,
     onBpmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val onPreview = rememberUpdatedState(onDialPreviewChange)
+    val onStart = rememberUpdatedState(onRingDragStart)
+    val onEnd = rememberUpdatedState(onRingDragEnd)
     val primary = MaterialTheme.colorScheme.primary
     val secondary = MaterialTheme.colorScheme.secondary
     val track = MaterialTheme.colorScheme.surfaceVariant
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Canvas(
             Modifier.fillMaxSize().pointerInput(Unit) {
-                detectDragGestures { change, _ ->
-                    val center = Offset(size.width / 2f, size.height / 2f)
-                    val pos = change.position
-                    val dx = pos.x - center.x
-                    val dy = pos.y - center.y
-                    var deg = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
-                    deg = (deg + 90f + 360f) % 360f
-                    val fraction = deg / 360f
-                    onBpmChange((10 + fraction * 290).roundToInt())
-                }
+                detectDragGestures(
+                    onDragStart = { onStart.value() },
+                    onDragEnd = { onEnd.value() },
+                    onDragCancel = { onEnd.value() },
+                    onDrag = { change, _ ->
+                        val center = Offset(size.width / 2f, size.height / 2f)
+                        val pos = change.position
+                        val dx = pos.x - center.x
+                        val dy = pos.y - center.y
+                        var deg = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+                        deg = (deg + 90f + 360f) % 360f
+                        val fraction = deg / 360f
+                        onPreview.value((10 + fraction * 290).roundToInt())
+                    },
+                )
             },
         ) {
             val stroke = 18.dp.toPx()
@@ -344,7 +387,7 @@ private fun BpmDial(
                 size = arcSize,
                 style = Stroke(width = stroke, cap = StrokeCap.Round),
             )
-            val sweep = (bpm - 10) / 290f * 360f
+            val sweep = (displayBpm - 10) / 290f * 360f
             drawArc(
                 color = secondary,
                 startAngle = -90f,
@@ -364,7 +407,7 @@ private fun BpmDial(
                     .padding(16.dp),
         ) {
             Text(
-                bpm.toString(),
+                displayBpm.toString(),
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
                 color = primary,
