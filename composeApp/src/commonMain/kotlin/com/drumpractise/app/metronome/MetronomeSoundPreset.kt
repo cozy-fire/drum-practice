@@ -9,4 +9,5 @@ enum class MetronomeSoundPreset {
     SharpClick,
     WoodKnock,
     SoftTick,
+    Tr707,
 }

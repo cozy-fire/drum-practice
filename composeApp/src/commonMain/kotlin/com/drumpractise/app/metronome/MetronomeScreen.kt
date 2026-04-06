@@ -37,7 +37,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -69,14 +68,7 @@ fun MetronomeScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val engine = remember { MetronomeEngine() }
-    DisposableEffect(Unit) {
-        onDispose { engine.release() }
-    }
-
-    LaunchedEffect(engine) {
-        engine.warmUp()
-    }
+    val engine = LocalMetronomeEngine.current
 
     var bpm by remember { mutableIntStateOf(110) }
     var noteDivisor by remember { mutableIntStateOf(1) }
@@ -264,6 +256,7 @@ private fun presetLabel(p: MetronomeSoundPreset): String =
         MetronomeSoundPreset.SharpClick -> "脆击"
         MetronomeSoundPreset.WoodKnock -> "木击"
         MetronomeSoundPreset.SoftTick -> "轻嗒"
+        MetronomeSoundPreset.Tr707 -> "TR-707"
     }
 
 @Composable

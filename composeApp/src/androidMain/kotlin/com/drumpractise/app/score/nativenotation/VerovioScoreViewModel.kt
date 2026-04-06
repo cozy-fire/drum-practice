@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.verovio.lib.toolkit
@@ -40,26 +39,19 @@ class VerovioScoreViewModel : ViewModel() {
         isEngineReady.value = false
         loadError.value = null
         try {
-            val targetDir = File(app.filesDir, "verovio/data")
-            resourcePath = targetDir.absolutePath
-
-            VerovioDataUnpacker.ensureUnpacked(app)
-
+            VerovioScoreRuntime.warmUp(app)
             withContext(Dispatchers.Main) {
-                verovioToolkit = toolkit(false)
-                verovioToolkit.setResourcePath(resourcePath)
-                verovioToolkit.setOptions("{'svgViewBox': 'true'}")
-                verovioToolkit.setOptions("{'scaleToPageSize': 'true'}")
-                verovioToolkit.setOptions("{'adjustPageHeight': 'true'}")
-                verovioToolkit.setOptions("{'fontTextLiberation': 'true'}")
-
-                val inputStream = app.assets.open("verovio-sample.mei")
-                val mei = inputStream.bufferedReader().use { it.readText() }
-                if (!verovioToolkit.loadData(mei)) {
-                    loadError.value = "默认示例谱 loadData 失败"
-                } else {
-                    updateSvg()
+                val shared = VerovioScoreRuntime.toolkitOrNull()
+                if (shared == null) {
+                    loadError.value = VerovioScoreRuntime.initialLoadError ?: "引擎未就绪"
+                    svgString.value = "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"
+                    isEngineReady.value = true
+                    return@withContext
                 }
+                verovioToolkit = shared
+                resourcePath = VerovioScoreRuntime.resourcePath()
+                svgString.value = VerovioScoreRuntime.initialSvg
+                loadError.value = VerovioScoreRuntime.initialLoadError
                 initialized = true
                 isEngineReady.value = true
             }
@@ -67,18 +59,8 @@ class VerovioScoreViewModel : ViewModel() {
             withContext(Dispatchers.Main) {
                 loadError.value = e.message ?: e.toString()
                 svgString.value = "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"
-                if (::verovioToolkit.isInitialized) {
-                    verovioToolkit.delete()
-                }
                 isEngineReady.value = true
             }
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        if (initialized) {
-            verovioToolkit.delete()
         }
     }
 

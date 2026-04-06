@@ -13,8 +13,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.drumpractise.app.metronome.LocalMetronomeEngine
+import com.drumpractise.app.metronome.MetronomeEngine
+import com.drumpractise.app.score.warmUpVerovioScoreEngine
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,6 +35,14 @@ import com.drumpractise.app.workbench.WorkbenchScreen
 
 @Composable
 fun App() {
+    val metronomeEngine = remember { MetronomeEngine() }
+    LaunchedEffect(metronomeEngine) {
+        metronomeEngine.warmUp()
+    }
+    LaunchedEffect(Unit) {
+        warmUpVerovioScoreEngine()
+    }
+
     AppTheme {
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
@@ -79,25 +93,27 @@ fun App() {
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 color = MaterialTheme.colorScheme.background,
             ) {
-                NavHost(
-                    navController = navController,
-                    startDestination = AppRoutes.WORKBENCH,
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    composable(AppRoutes.WORKBENCH) {
-                        WorkbenchScreen(
-                            onOpenMetronome = { navController.navigate(AppRoutes.METRONOME) },
-                            onOpenMusicXmlScore = { navController.navigate(AppRoutes.MUSIC_XML_SCORE) },
-                        )
-                    }
-                    composable(AppRoutes.MORE) {
-                        MorePlaceholderScreen()
-                    }
-                    composable(AppRoutes.METRONOME) {
-                        MetronomeScreen(onBack = { navController.popBackStack() })
-                    }
-                    composable(AppRoutes.MUSIC_XML_SCORE) {
-                        MusicXmlScoreScreen(onBack = { navController.popBackStack() })
+                CompositionLocalProvider(LocalMetronomeEngine provides metronomeEngine) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = AppRoutes.WORKBENCH,
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        composable(AppRoutes.WORKBENCH) {
+                            WorkbenchScreen(
+                                onOpenMetronome = { navController.navigate(AppRoutes.METRONOME) },
+                                onOpenMusicXmlScore = { navController.navigate(AppRoutes.MUSIC_XML_SCORE) },
+                            )
+                        }
+                        composable(AppRoutes.MORE) {
+                            MorePlaceholderScreen()
+                        }
+                        composable(AppRoutes.METRONOME) {
+                            MetronomeScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable(AppRoutes.MUSIC_XML_SCORE) {
+                            MusicXmlScoreScreen(onBack = { navController.popBackStack() })
+                        }
                     }
                 }
             }

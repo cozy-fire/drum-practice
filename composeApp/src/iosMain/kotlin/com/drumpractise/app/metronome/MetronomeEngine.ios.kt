@@ -38,6 +38,7 @@ actual class MetronomeEngine actual constructor() {
         stop()
         storedOnBeat = onBeat
         running = true
+        val intervalNs = metronomeIntervalNs(config.bpm, config.noteDivisor)
         val intervalMs = metronomeIntervalMs(config.bpm, config.noteDivisor)
         val period = metronomeBeatPeriod(config.noteDivisor)
         val presetOrdinal = config.preset.ordinal
@@ -49,7 +50,7 @@ actual class MetronomeEngine actual constructor() {
                 }
                 val player = playerNode ?: return@launch
                 val sr = outputSampleRate
-                val samplesPerBeat = (intervalMs / 1000.0 * sr).toLong().coerceAtLeast(1L)
+                val samplesPerBeat = (intervalNs / 1_000_000_000.0 * sr).toLong().coerceAtLeast(1L)
                 var nextSampleTime = 0L
                 var beat = 0
                 var nextDeadlineMs = uptimeMs()
@@ -92,7 +93,7 @@ actual class MetronomeEngine actual constructor() {
         start(config, cb)
     }
 
-    actual fun warmUp() {}
+    actual suspend fun warmUp() {}
 
     actual fun release() {
         stop()

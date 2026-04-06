@@ -2,12 +2,12 @@ package com.drumpractise.app.metronome
 
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import java.util.concurrent.locks.LockSupport
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 import javax.swing.SwingUtilities
 import kotlin.math.PI
-import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
@@ -21,23 +21,22 @@ actual class MetronomeEngine actual constructor() {
         stopLoop()
         storedOnBeat = onBeat
         running = true
-        val intervalMs = metronomeIntervalMs(config.bpm, config.noteDivisor)
+        val intervalNs = metronomeIntervalNs(config.bpm, config.noteDivisor)
         val preset = config.preset
         val period = metronomeBeatPeriod(config.noteDivisor)
         loopFuture =
             executor.submit {
                 var beat = 0
                 var nextDeadlineNs = System.nanoTime()
-                val intervalNs = intervalMs * 1_000_000L
                 while (running) {
-                    val now = System.nanoTime()
-                    val sleepMs = max(0L, (nextDeadlineNs - now) / 1_000_000L)
-                    if (sleepMs > 0) {
-                        try {
-                            Thread.sleep(sleepMs)
-                        } catch (_: InterruptedException) {
-                            break
-                        }
+                    var remaining = nextDeadlineNs - System.nanoTime()
+                    while (remaining > 0L && running) {
+                        LockSupport.parkNanos(remaining)
+                        remaining = nextDeadlineNs - System.nanoTime()
+                    }
+                    if (Thread.interrupted()) {
+                        Thread.interrupted()
+                        break
                     }
                     if (!running) break
                     val indexInPeriod = beat % period
@@ -64,7 +63,7 @@ actual class MetronomeEngine actual constructor() {
         start(config, cb)
     }
 
-    actual fun warmUp() {}
+    actual suspend fun warmUp() {}
 
     actual fun release() {
         stop()
@@ -130,6 +129,12 @@ actual class MetronomeEngine actual constructor() {
                         MetronomeAccent.Strong -> 720.0
                         MetronomeAccent.Medium -> 630.0
                         MetronomeAccent.Weak -> 540.0
+                    }
+                MetronomeSoundPreset.Tr707 ->
+                    when (tier) {
+                        MetronomeAccent.Strong -> 920.0
+                        MetronomeAccent.Medium -> 620.0
+                        MetronomeAccent.Weak -> 620.0
                     }
             }
         val durationMs =
