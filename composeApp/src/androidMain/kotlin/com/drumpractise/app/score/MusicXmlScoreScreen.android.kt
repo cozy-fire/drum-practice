@@ -1,9 +1,6 @@
 package com.drumpractise.app.score
 
-import android.annotation.SuppressLint
 import android.net.Uri
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -45,33 +42,11 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.drumpractise.app.score.nativenotation.VerovioScoreRuntime
 import com.drumpractise.app.score.nativenotation.VerovioScoreViewModel
+import com.drumpractise.app.score.webview.VerovioWebViewPool
 import java.io.File
 import java.io.FileOutputStream
-
-private const val SAMPLE_MUSIC_XML =
-    """<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="3.1">
-  <part-list>
-    <score-part id="P1"><part-name>Music</part-name></score-part>
-  </part-list>
-  <part id="P1">
-    <measure number="1">
-      <attributes>
-        <divisions>1</divisions>
-        <key><fifths>0</fifths></key>
-        <time><beats>4</beats><beat-type>4</beat-type></time>
-        <clef><sign>G</sign><line>2</line></clef>
-      </attributes>
-      <note>
-        <pitch><step>C</step><octave>4</octave></pitch>
-        <duration>4</duration>
-        <type>whole</type>
-      </note>
-    </measure>
-  </part>
-</score-partwise>"""
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -163,7 +138,9 @@ actual fun MusicXmlScoreScreen(onBack: () -> Unit) {
                         Text("打开文件")
                     }
                     TextButton(
-                        onClick = { viewModel.loadMusicXmlString(SAMPLE_MUSIC_XML) },
+                        onClick = {
+                            viewModel.loadMusicXmlString(VerovioScoreRuntime.readSampleMusicXml(context))
+                        },
                         enabled = engineReady,
                     ) {
                         Text("示例 XML")
@@ -204,7 +181,6 @@ actual fun MusicXmlScoreScreen(onBack: () -> Unit) {
     }
 }
 
-@SuppressLint("SetJavaScriptEnabled")
 @Composable
 private fun VerovioSvgWebView(
     svgContent: String,
@@ -225,15 +201,11 @@ private fun VerovioSvgWebView(
         }
 
     AndroidView(
-        factory = { ctx ->
-            WebView(ctx).apply {
-                webViewClient = WebViewClient()
-                settings.javaScriptEnabled = false
-            }
-        },
+        factory = { VerovioWebViewPool.acquire() },
         update = { webView ->
             webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
         },
+        onRelease = { webView -> VerovioWebViewPool.release(webView) },
         modifier =
             modifier.onSizeChanged { size ->
                 if (size.width > 0 && size.height > 0) {

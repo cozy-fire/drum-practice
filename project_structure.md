@@ -69,7 +69,7 @@ composeApp/src/androidMain/
 │   └── nativenotation/VerovioScoreViewModel.kt
 ├── assets/
 │   ├── verovio/data/              # 构建时从 external/verovio/data 拷贝
-│   └── verovio-sample.mei
+│   └── verovio-sample.musicxml
 └── ...
 ```
 

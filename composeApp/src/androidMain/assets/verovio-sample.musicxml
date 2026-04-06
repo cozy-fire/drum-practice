@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <work>
+    <work-title>架子鼓示例</work-title>
+  </work>
+  <identification>
+    <encoding>
+      <encoding-date>2026-04-06</encoding-date>
+      <software>DrumPractise</software>
+    </encoding>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>架子鼓</part-name>
+      <score-instrument id="P1-I36">
+        <instrument-name>底鼓 (Kick)</instrument-name>
+      </score-instrument>
+      <score-instrument id="P1-I38">
+        <instrument-name>军鼓 (Snare)</instrument-name>
+      </score-instrument>
+      <score-instrument id="P1-I42">
+        <instrument-name>闭镲 (Hi-Hat Closed)</instrument-name>
+      </score-instrument>
+      <score-instrument id="P1-I49">
+        <instrument-name>碎镲 (Crash)</instrument-name>
+      </score-instrument>
+      <midi-instrument id="P1-I36">
+        <midi-channel>10</midi-channel>
+        <midi-unpitched>36</midi-unpitched>
+      </midi-instrument>
+      <midi-instrument id="P1-I38">
+        <midi-channel>10</midi-channel>
+        <midi-unpitched>38</midi-unpitched>
+      </midi-instrument>
+      <midi-instrument id="P1-I42">
+        <midi-channel>10</midi-channel>
+        <midi-unpitched>42</midi-unpitched>
+      </midi-instrument>
+      <midi-instrument id="P1-I49">
+        <midi-channel>10</midi-channel>
+        <midi-unpitched>49</midi-unpitched>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <!-- 4/4 摇滚型：踩镲八分，底鼓 1/3 拍，军鼓 2/4 拍 -->
+    <measure number="1">
+      <attributes>
+        <divisions>4</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>percussion</sign></clef>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <words default-y="16" font-weight="bold">♩ = 100</words>
+        </direction-type>
+      </direction>
+      <!-- 1e: HH + Kick -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">begin</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I36" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <!-- 2e: HH -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <!-- 3e: HH + Snare -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I38" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <!-- 4e: HH -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <!-- 5e: HH + Kick -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I36" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <!-- 6e: HH -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <!-- 7e: HH + Snare -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I38" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <!-- 8e: HH -->
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">end</beam>
+        <notehead>x</notehead>
+      </note>
+    </measure>
+    <!-- 第 2 小节：同型 + 第 1 拍碎镲叠踩镲 -->
+    <measure number="2">
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">begin</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I36" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>A</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I49" />
+        <type>eighth</type>
+        <stem>up</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I38" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I36" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I38" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">end</beam>
+        <notehead>x</notehead>
+      </note>
+    </measure>
+    <!-- 第 3 小节：回到基础型（同小节 1） -->
+    <measure number="3">
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">begin</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I36" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I38" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I36" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">continue</beam>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I38" />
+        <type>eighth</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42" />
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam number="1">end</beam>
+        <notehead>x</notehead>
+      </note>
+    </measure>
+    <!-- 第 4 小节：全踩镲四分型：底鼓-军鼓-底鼓-军鼓 -->
+    <measure number="4">
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>4</duration>
+        <instrument id="P1-I42" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched>
+        <duration>4</duration>
+        <instrument id="P1-I36" />
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>4</duration>
+        <instrument id="P1-I42" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>
+        <duration>4</duration>
+        <instrument id="P1-I38" />
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>4</duration>
+        <instrument id="P1-I42" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched>
+        <duration>4</duration>
+        <instrument id="P1-I36" />
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched>
+        <duration>4</duration>
+        <instrument id="P1-I42" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched>
+        <duration>4</duration>
+        <instrument id="P1-I38" />
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+    </measure>
+  </part>
+</score-partwise>

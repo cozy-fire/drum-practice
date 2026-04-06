@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 import org.verovio.lib.toolkit
 
 /**
- * Wraps Verovio JNI [toolkit] for offline MEI / MusicXML / MXL rendering (SVG).
+ * Wraps Verovio JNI [toolkit] for offline MusicXML / MEI / MXL rendering (SVG).
  * Behaviour aligned with [verovio-android-demo](https://github.com/rism-digital/verovio-android-demo).
  */
 class VerovioScoreViewModel : ViewModel() {
@@ -50,7 +50,14 @@ class VerovioScoreViewModel : ViewModel() {
                 }
                 verovioToolkit = shared
                 resourcePath = VerovioScoreRuntime.resourcePath()
-                svgString.value = VerovioScoreRuntime.initialSvg
+                // 共享 toolkit 可能已被上次会话 loadData，不能用进程启动时的 initialSvg 快照（会与当前谱面不一致导致闪屏）
+                currentPage = 1
+                svgString.value =
+                    if (verovioToolkit.getPageCount() > 0) {
+                        verovioToolkit.renderToSVG(1)
+                    } else {
+                        "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"
+                    }
                 loadError.value = VerovioScoreRuntime.initialLoadError
                 initialized = true
                 isEngineReady.value = true
