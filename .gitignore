@@ -21,3 +21,4 @@ Thumbs.db
 
 # Debug session NDJSON (local only)
 debug-*.log
+/composeApp/.cxx/
