@@ -260,7 +260,7 @@ object VerovioWebViewPool {
     private fun createConfiguredWebView(): WebView {
         return WebView(appContext).apply {
             webViewClient = WebViewClient()
-            settings.javaScriptEnabled = false
+            settings.javaScriptEnabled = true
         }
     }
 

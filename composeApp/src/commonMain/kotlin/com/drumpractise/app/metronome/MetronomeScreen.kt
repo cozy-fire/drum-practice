@@ -61,16 +61,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.drumpractise.app.theme.DrumAccentBeat
 import drum_practice.composeapp.generated.resources.Res
 import drum_practice.composeapp.generated.resources.metronome_note_four_sixteenth_selected
 import drum_practice.composeapp.generated.resources.metronome_note_four_sixteenth_unselected
-import drum_practice.composeapp.generated.resources.metronome_note_quarter_selected
 import drum_practice.composeapp.generated.resources.metronome_note_quarter_unselected
+import drum_practice.composeapp.generated.resources.metronome_note_quarter_selected
 import drum_practice.composeapp.generated.resources.metronome_note_two_eighth_selected
 import drum_practice.composeapp.generated.resources.metronome_note_two_eighth_unselected
 import org.jetbrains.compose.resources.DrawableResource

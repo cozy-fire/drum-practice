@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">Drumset</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>4</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>percussion</sign><line>2</line></clef>
+      </attributes>
+      <direction placement="above">
+        <direction-type><words>Fill (16ths)</words></direction-type>
+      </direction>
+      <!-- 16th-note snare/tom pattern -->
+      <note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I38"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I38"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>D</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I48"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>D</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I48"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>E</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I50"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>E</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I50"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>F</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I52"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>F</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I52"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>E</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I50"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>E</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I50"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>D</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I48"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>D</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I48"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I38"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="P1-I38"/><voice>1</voice><type>16th</type><stem>up</stem></note>
+      <note><unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched><duration>2</duration><instrument id="P1-I36"/><voice>1</voice><type>eighth</type><stem>up</stem></note>
+    </measure>
+  </part>
+</score-partwise>
+
