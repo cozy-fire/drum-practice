@@ -39,8 +39,8 @@ fun WorkbenchScreen(
             onClick = onOpenMetronome,
         )
         WorkbenchFeatureCard(
-            title = "MusicXML 五线谱",
-            subtitle = "Android 离线 Verovio · MEI / MusicXML / MXL",
+            title = "随机练习",
+            subtitle = "随机节奏型 · 加花 · 视奏训练",
             onClick = onOpenMusicXmlScore,
         )
     }

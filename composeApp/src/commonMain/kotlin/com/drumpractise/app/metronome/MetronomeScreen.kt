@@ -1,6 +1,7 @@
 package com.drumpractise.app.metronome
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -65,6 +66,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.drumpractise.app.theme.DrumAccentBeat
+import drum_practice.composeapp.generated.resources.Res
+import drum_practice.composeapp.generated.resources.metronome_note_four_sixteenth_selected
+import drum_practice.composeapp.generated.resources.metronome_note_four_sixteenth_unselected
+import drum_practice.composeapp.generated.resources.metronome_note_quarter_selected
+import drum_practice.composeapp.generated.resources.metronome_note_quarter_unselected
+import drum_practice.composeapp.generated.resources.metronome_note_two_eighth_selected
+import drum_practice.composeapp.generated.resources.metronome_note_two_eighth_unselected
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import kotlin.math.atan2
 import kotlin.math.roundToInt
 
@@ -170,20 +180,17 @@ fun MetronomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 NoteChoice(
-                    symbol = "♩",
-                    caption = "1个四分音符",
+                    noteDivisor = 1,
                     selected = noteDivisor == 1,
                     onClick = { noteDivisor = 1 },
                 )
                 NoteChoice(
-                    symbol = "♪♪",
-                    caption = "2个八分音符",
+                    noteDivisor = 2,
                     selected = noteDivisor == 2,
                     onClick = { noteDivisor = 2 },
                 )
                 NoteChoice(
-                    symbol = "♬",
-                    caption = "4个十六分音符",
+                    noteDivisor = 4,
                     selected = noteDivisor == 4,
                     onClick = { noteDivisor = 4 },
                 )
@@ -294,8 +301,7 @@ private fun presetLabel(p: MetronomeSoundPreset): String =
 
 @Composable
 private fun NoteChoice(
-    symbol: String,
-    caption: String,
+    noteDivisor: Int,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -303,9 +309,21 @@ private fun NoteChoice(
     val bg =
         if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
         else MaterialTheme.colorScheme.surfaceVariant
-    val fg =
-        if (selected) MaterialTheme.colorScheme.onPrimary
-        else MaterialTheme.colorScheme.onSurfaceVariant
+    val icon: DrawableResource =
+        when (noteDivisor) {
+            1 ->
+                if (selected) Res.drawable.metronome_note_quarter_selected
+                else Res.drawable.metronome_note_quarter_unselected
+            2 ->
+                if (selected) Res.drawable.metronome_note_two_eighth_selected
+                else Res.drawable.metronome_note_two_eighth_unselected
+            4 ->
+                if (selected) Res.drawable.metronome_note_four_sixteenth_selected
+                else Res.drawable.metronome_note_four_sixteenth_unselected
+            else ->
+                if (selected) Res.drawable.metronome_note_quarter_selected
+                else Res.drawable.metronome_note_quarter_unselected
+        }
     Box(
         modifier =
             modifier
@@ -315,27 +333,17 @@ private fun NoteChoice(
                 .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 4.dp),
-        ) {
-            Text(
-                text = symbol,
-                fontSize = 22.sp,
-                color = fg,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-            )
-            Text(
-                text = caption,
-                fontSize = 10.sp,
-                lineHeight = 12.sp,
-                color = fg,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
+        Image(
+            painter = painterResource(icon),
+            contentDescription =
+                when (noteDivisor) {
+                    1 -> "1个四分音符"
+                    2 -> "2个八分音符"
+                    4 -> "4个十六分音符"
+                    else -> "拍数"
+                },
+            modifier = Modifier.size(if (noteDivisor == 4)  35.dp else 25.dp),
+        )
     }
 }
 
