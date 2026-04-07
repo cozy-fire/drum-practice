@@ -1,5 +1,7 @@
 package com.drumpractise.app.score
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -7,9 +9,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.drumpractise.app.score.nativenotation.VerovioScoreRuntime
 import com.drumpractise.app.score.webview.VerovioWebViewPool
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -17,6 +23,7 @@ import kotlinx.coroutines.sync.withLock
 actual fun StaffPreview(
     musicXml: String,
     zoomScale: Float,
+    playbackHighlight: Boolean,
     modifier: Modifier,
 ) {
     var svgContent by remember { mutableStateOf("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>") }
@@ -29,7 +36,15 @@ actual fun StaffPreview(
             return@LaunchedEffect
         }
 
-        val tk = VerovioScoreRuntime.toolkitOrNull()
+        var tk = VerovioScoreRuntime.toolkitOrNull()
+        var waitTicks = 0
+        if (tk == null) {
+            while (waitTicks < 200 && tk == null) {
+                delay(16)
+                tk = VerovioScoreRuntime.toolkitOrNull()
+                waitTicks++
+            }
+        }
         if (tk == null) {
             svgContent = "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"
             return@LaunchedEffect
@@ -90,6 +105,15 @@ actual fun StaffPreview(
             """.trimIndent()
         }
 
+    val staffShape = RoundedCornerShape(20.dp)
+    val borderWidth = if (playbackHighlight) 3.dp else 1.dp
+    val borderColor =
+        if (playbackHighlight) {
+            Color(0xFF38BDF8)
+        } else {
+            Color.Black.copy(alpha = 0.10f)
+        }
+
     AndroidView(
         factory = { VerovioWebViewPool.acquire() },
         update = { webView ->
@@ -97,11 +121,13 @@ actual fun StaffPreview(
             webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
         },
         onRelease = { webView -> VerovioWebViewPool.release(webView) },
-        modifier = modifier,
+        modifier =
+            modifier
+                .clip(staffShape)
+                .border(width = borderWidth, color = borderColor, shape = staffShape),
     )
 }
 
 private object RenderMutexHolder {
     val mutex = Mutex()
 }
-

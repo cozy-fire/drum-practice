@@ -7,6 +7,6 @@ import androidx.compose.ui.Modifier
 expect fun StaffPreview(
     musicXml: String,
     zoomScale: Float,
+    playbackHighlight: Boolean = false,
     modifier: Modifier = Modifier,
 )
-

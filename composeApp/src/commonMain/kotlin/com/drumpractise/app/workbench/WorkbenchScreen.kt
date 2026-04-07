@@ -1,21 +1,39 @@
 package com.drumpractise.app.workbench
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import drum_practice.composeapp.generated.resources.Res
+import drum_practice.composeapp.generated.resources.workbench_metronome
+import drum_practice.composeapp.generated.resources.workbench_random_practice
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun WorkbenchScreen(
@@ -23,6 +41,24 @@ fun WorkbenchScreen(
     onOpenMusicXmlScore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val features =
+        listOf(
+            WorkbenchFeature(
+                title = "节拍器",
+                subtitle = "BPM · 音符时值 · 多音色",
+                icon = Res.drawable.workbench_metronome,
+                gradient = listOf(Color(0xFF5A2E84), Color(0xFF2B1655)),
+                onClick = onOpenMetronome,
+            ),
+            WorkbenchFeature(
+                title = "随机练习",
+                subtitle = "随机节奏型 · 加花 · 视奏训练",
+                icon = Res.drawable.workbench_random_practice,
+                gradient = listOf(Color(0xFF224A88), Color(0xFF0F2347)),
+                onClick = onOpenMusicXmlScore,
+            ),
+        )
+
     Column(
         modifier =
             modifier
@@ -31,36 +67,77 @@ fun WorkbenchScreen(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("工作台", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
-        Text("选择功能", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        WorkbenchFeatureCard(
-            title = "节拍器",
-            subtitle = "BPM · 音符时值 · 多音色",
-            onClick = onOpenMetronome,
-        )
-        WorkbenchFeatureCard(
-            title = "随机练习",
-            subtitle = "随机节奏型 · 加花 · 视奏训练",
-            onClick = onOpenMusicXmlScore,
-        )
+        Text("我的工作台", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text("选择功能开始您的工作", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 160.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            items(features) { f ->
+                WorkbenchFeatureTile(feature = f)
+            }
+        }
+    }
+}
+
+private data class WorkbenchFeature(
+    val title: String,
+    val subtitle: String,
+    val icon: DrawableResource,
+    val gradient: List<Color>,
+    val onClick: () -> Unit,
+)
+
+@Composable
+private fun WorkbenchFeatureTile(
+    feature: WorkbenchFeature,
+    modifier: Modifier = Modifier,
+) {
+    val gradientBrush = rememberGradient(feature.gradient)
+    Card(
+        modifier = modifier.fillMaxWidth().clickable(onClick = feature.onClick),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(gradientBrush)
+                    .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(14.dp))
+                        .padding(10.dp)
+                        .size(60.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(feature.icon),
+                    contentDescription = null,
+                    tint = Color.White,
+                )
+            }
+            Text(feature.title, style = MaterialTheme.typography.titleMedium, color = Color.White)
+            Text(feature.subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.78f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+                )
+        }
     }
 }
 
 @Composable
-private fun WorkbenchFeatureCard(
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Card(
-        modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-}
+private fun rememberGradient(colors: List<Color>): Brush =
+    Brush.linearGradient(colors)

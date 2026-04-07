@@ -28,9 +28,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.drumpractise.app.metronome.MetronomeScreen
 import com.drumpractise.app.navigation.AppRoutes
+import com.drumpractise.app.settings.SettingsScreen
 import com.drumpractise.app.score.MusicXmlScoreScreen
 import com.drumpractise.app.theme.AppTheme
-import com.drumpractise.app.workbench.MorePlaceholderScreen
 import com.drumpractise.app.workbench.WorkbenchScreen
 
 @Composable
@@ -47,7 +47,7 @@ fun App() {
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
         val route = backStackEntry?.destination?.route
-        val showBottomBar = route == AppRoutes.WORKBENCH || route == AppRoutes.MORE
+        val showBottomBar = route == AppRoutes.WORKBENCH || route == AppRoutes.SETTINGS
 
         Scaffold(
             contentWindowInsets =
@@ -72,9 +72,9 @@ fun App() {
                             label = { Text("工作台") },
                         )
                         NavigationBarItem(
-                            selected = route == AppRoutes.MORE,
+                            selected = route == AppRoutes.SETTINGS,
                             onClick = {
-                                navController.navigate(AppRoutes.MORE) {
+                                navController.navigate(AppRoutes.SETTINGS) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
                                     }
@@ -82,8 +82,8 @@ fun App() {
                                     restoreState = true
                                 }
                             },
-                            icon = { Text("⋯") },
-                            label = { Text("更多") },
+                            icon = { Text("⚙") },
+                            label = { Text("设置") },
                         )
                     }
                 }
@@ -105,9 +105,7 @@ fun App() {
                                 onOpenMusicXmlScore = { navController.navigate(AppRoutes.MUSIC_XML_SCORE) },
                             )
                         }
-                        composable(AppRoutes.MORE) {
-                            MorePlaceholderScreen()
-                        }
+                        composable(AppRoutes.SETTINGS) { SettingsScreen() }
                         composable(AppRoutes.METRONOME) {
                             MetronomeScreen(onBack = { navController.popBackStack() })
                         }

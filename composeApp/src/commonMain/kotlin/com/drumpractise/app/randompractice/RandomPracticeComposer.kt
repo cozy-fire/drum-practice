@@ -27,6 +27,19 @@ object RandomPracticeComposer {
             "random_practice/fill_02.musicxml",
         )
 
+    private const val SETTINGS_RHYTHMIC_PATH = "random_practice/rhythmic_settings.musicxml"
+
+    /** 设置页预览专用：固定节奏谱，加花字段为空。 */
+    suspend fun composeForSettings(): PracticeComposeItem {
+        val rhythmicXml = loadMusicXml(SETTINGS_RHYTHMIC_PATH)
+        return PracticeComposeItem(
+            rhythmicPath = SETTINGS_RHYTHMIC_PATH,
+            fillPath = "",
+            rhythmicXml = rhythmicXml,
+            fillXml = "",
+        )
+    }
+
     suspend fun composeRandom(exclude: PracticeComposeItem? = null): PracticeComposeItem {
         val rhythmicPath = pickRandomAvoiding(defaultRhythmicPaths, exclude?.rhythmicPath)
         val fillPath = pickRandomAvoiding(defaultFillPaths, exclude?.fillPath)
@@ -38,6 +51,20 @@ object RandomPracticeComposer {
             rhythmicXml = rhythmicXml,
             fillXml = fillXml,
         )
+    }
+
+    /** 仅随机节奏型；`fillPath` / `fillXml` 保持不变。 */
+    suspend fun composeRandomRhythmOnly(current: PracticeComposeItem): PracticeComposeItem {
+        val rhythmicPath = pickRandomAvoiding(defaultRhythmicPaths, current.rhythmicPath)
+        val rhythmicXml = loadMusicXml(rhythmicPath)
+        return current.copy(rhythmicPath = rhythmicPath, rhythmicXml = rhythmicXml)
+    }
+
+    /** 仅随机加花；`rhythmicPath` / `rhythmicXml` 保持不变。 */
+    suspend fun composeRandomFillOnly(current: PracticeComposeItem): PracticeComposeItem {
+        val fillPath = pickRandomAvoiding(defaultFillPaths, current.fillPath)
+        val fillXml = loadMusicXml(fillPath)
+        return current.copy(fillPath = fillPath, fillXml = fillXml)
     }
 
     private fun pickRandomAvoiding(options: List<String>, exclude: String?): String {
