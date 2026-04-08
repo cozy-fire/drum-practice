@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 actual fun StaffPreview(
     musicXml: String,
-    zoomScale: Float,
     playbackHighlight: Boolean,
     modifier: Modifier,
 ) {

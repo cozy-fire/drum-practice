@@ -15,7 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,7 +31,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.drumpractise.app.constance.VerovioConfig
 import com.drumpractise.app.metronome.LocalMetronomeEngine
+import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.metronome.MetronomeRunConfig
 import com.drumpractise.app.metronome.MetronomeSoundPreset
 import com.drumpractise.app.randompractice.PracticeComposeItem
@@ -39,7 +41,7 @@ import com.drumpractise.app.randompractice.RandomPracticeComposer
 import com.drumpractise.app.settings.AppSettings
 import com.drumpractise.app.score.components.BpmEditDialog
 import com.drumpractise.app.score.components.MusicXmlScoreTopBar
-import com.drumpractise.app.score.components.PracticeCard
+import com.drumpractise.app.score.components.RhythmicPracticeCard
 import com.drumpractise.app.score.components.ScorePlaybackPart
 import com.drumpractise.app.score.components.StaffZoomAdjustBar
 import com.drumpractise.app.score.components.TopActionButton
@@ -70,11 +72,24 @@ fun MusicXmlScoreScreenContent(
     var scorePlaybackPart by remember { mutableStateOf<ScorePlaybackPart?>(null) }
     val hitSound = rememberScoreHitSoundPlayer()
 
-    val zoomSteps = remember { List(10) { i -> 0.85f + 0.15f * i } }
-    val initialZoomIndex = remember { AppSettings.getStaffZoomIndex() ?: 2 }
+    val zoomSteps = remember { VerovioConfig.ZOOM_STEPS }
+    val initialZoomIndex =
+        remember {
+            val scale = AppSettings.getStaffZoomScale()
+            val idx = zoomSteps.indexOfFirst { kotlin.math.abs(it - scale) < 0.0001f }
+            (if (idx >= 0) idx else 2).coerceIn(0, zoomSteps.lastIndex)
+        }
     var zoomIndex by remember { mutableIntStateOf(initialZoomIndex.coerceIn(0, zoomSteps.lastIndex)) }
     val zoomScale = zoomSteps[zoomIndex]
     var showZoomSetupBar by remember { mutableStateOf(!AppSettings.getStaffZoomConfigured()) }
+
+    LaunchedEffect(showZoomSetupBar, zoomScale) {
+        if (showZoomSetupBar) {
+            StaffZoomStore.setPreviewScale(zoomScale)
+        } else {
+            StaffZoomStore.clearPreview()
+        }
+    }
 
     LaunchedEffect(Unit) {
         selection = RandomPracticeComposer.composeRandom()
@@ -131,8 +146,8 @@ fun MusicXmlScoreScreenContent(
             MusicXmlScoreTopBar(
                 onBack = onBack,
                 bpm = bpm,
-                onBpmMinus = { bpm = (bpm - 1).coerceIn(10, 300) },
-                onBpmPlus = { bpm = (bpm + 1).coerceIn(10, 300) },
+                onBpmMinus = { bpm = (bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) },
+                onBpmPlus = { bpm = (bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) },
                 onOpenBpmDialog = {
                     bpmDraft = ""
                     bpmDialogOpen = true
@@ -161,8 +176,7 @@ fun MusicXmlScoreScreenContent(
                         onZoomIn = { zoomIndex = (zoomIndex + 1).coerceAtMost(zoomSteps.lastIndex) },
                         confirmText = "确定",
                         onConfirm = {
-                            AppSettings.setStaffZoomIndex(zoomIndex)
-                            AppSettings.setStaffZoomConfigured(true)
+                            StaffZoomStore.commitScale(zoomScale)
                             showZoomSetupBar = false
                         },
                         title = "首次设置谱面显示比例",
@@ -193,7 +207,7 @@ fun MusicXmlScoreScreenContent(
                 )
                 TopActionButton(
                     text = "随机组合",
-                    icon = { Icon(Icons.Filled.Shuffle, contentDescription = null) },
+                    icon = { Icon(Icons.Filled.Refresh, contentDescription = null) },
                     onClick = {
                         scope.launch {
                             selection = RandomPracticeComposer.composeRandom(exclude = selection)
@@ -208,117 +222,113 @@ fun MusicXmlScoreScreenContent(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                item {
-                    BoxWithConstraints(Modifier.fillMaxWidth()) {
-                        val wide = this.maxWidth >= 600.dp
-                        if (!wide) {
-                            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                                PracticeCard(
-                                    title = "节奏型",
-                                    musicXml = selection?.rhythmicXml.orEmpty(),
-                                    zoomScale = zoomScale,
-                                    gradientColors =
-                                        listOf(
-                                            Color(0xFF4C2A74),
-                                            Color(0xFF1D123F),
-                                        ),
-                                    onShuffleThis = {
-                                        selection?.let { s ->
-                                            scope.launch {
-                                                selection = RandomPracticeComposer.composeRandomRhythmOnly(s)
+                    item {
+                        BoxWithConstraints(Modifier.fillMaxWidth()) {
+                            val wide = this.maxWidth >= 600.dp
+                            if (!wide) {
+                                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                                    RhythmicPracticeCard(
+                                        title = "节奏型",
+                                        musicXml = selection?.rhythmicXml.orEmpty(),
+                                        gradientColors =
+                                            listOf(
+                                                Color(0xFF4C2A74),
+                                                Color(0xFF1D123F),
+                                            ),
+                                        onShuffleThis = {
+                                            selection?.let { s ->
+                                                scope.launch {
+                                                    selection = RandomPracticeComposer.composeRandomRhythmOnly(s)
+                                                }
                                             }
-                                        }
-                                    },
-                                    scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Rhythm,
-                                    onToggleScorePlayback = {
-                                        scorePlaybackPart =
-                                            if (scorePlaybackPart == ScorePlaybackPart.Rhythm) null else ScorePlaybackPart.Rhythm
-                                    },
+                                        },
+                                        scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Rhythm,
+                                        onToggleScorePlayback = {
+                                            scorePlaybackPart =
+                                                if (scorePlaybackPart == ScorePlaybackPart.Rhythm) null else ScorePlaybackPart.Rhythm
+                                        },
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    RhythmicPracticeCard(
+                                        title = "加花",
+                                        musicXml = selection?.fillXml.orEmpty(),
+                                        gradientColors =
+                                            listOf(
+                                                Color(0xFF123B73),
+                                                Color(0xFF081A39),
+                                            ),
+                                        onShuffleThis = {
+                                            selection?.let { s ->
+                                                scope.launch {
+                                                    selection = RandomPracticeComposer.composeRandomFillOnly(s)
+                                                }
+                                            }
+                                        },
+                                        scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Fill,
+                                        onToggleScorePlayback = {
+                                            scorePlaybackPart =
+                                                if (scorePlaybackPart == ScorePlaybackPart.Fill) null else ScorePlaybackPart.Fill
+                                        },
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            } else {
+                                Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                )
-                                PracticeCard(
-                                    title = "加花",
-                                    musicXml = selection?.fillXml.orEmpty(),
-                                    zoomScale = zoomScale,
-                                    gradientColors =
-                                        listOf(
-                                            Color(0xFF123B73),
-                                            Color(0xFF081A39),
-                                        ),
-                                    onShuffleThis = {
-                                        selection?.let { s ->
-                                            scope.launch {
-                                                selection = RandomPracticeComposer.composeRandomFillOnly(s)
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                ) {
+                                    RhythmicPracticeCard(
+                                        title = "节奏型",
+                                        musicXml = selection?.rhythmicXml.orEmpty(),
+                                        gradientColors =
+                                            listOf(
+                                                Color(0xFF4C2A74),
+                                                Color(0xFF1D123F),
+                                            ),
+                                        onShuffleThis = {
+                                            selection?.let { s ->
+                                                scope.launch {
+                                                    selection = RandomPracticeComposer.composeRandomRhythmOnly(s)
+                                                }
                                             }
-                                        }
-                                    },
-                                    scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Fill,
-                                    onToggleScorePlayback = {
-                                        scorePlaybackPart =
-                                            if (scorePlaybackPart == ScorePlaybackPart.Fill) null else ScorePlaybackPart.Fill
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            }
-                        } else {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            ) {
-                                PracticeCard(
-                                    title = "节奏型",
-                                    musicXml = selection?.rhythmicXml.orEmpty(),
-                                    zoomScale = zoomScale,
-                                    gradientColors =
-                                        listOf(
-                                            Color(0xFF4C2A74),
-                                            Color(0xFF1D123F),
-                                        ),
-                                    onShuffleThis = {
-                                        selection?.let { s ->
-                                            scope.launch {
-                                                selection = RandomPracticeComposer.composeRandomRhythmOnly(s)
+                                        },
+                                        scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Rhythm,
+                                        onToggleScorePlayback = {
+                                            scorePlaybackPart =
+                                                if (scorePlaybackPart == ScorePlaybackPart.Rhythm) null else ScorePlaybackPart.Rhythm
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                    RhythmicPracticeCard(
+                                        title = "加花",
+                                        musicXml = selection?.fillXml.orEmpty(),
+                                        gradientColors =
+                                            listOf(
+                                                Color(0xFF123B73),
+                                                Color(0xFF081A39),
+                                            ),
+                                        onShuffleThis = {
+                                            selection?.let { s ->
+                                                scope.launch {
+                                                    selection = RandomPracticeComposer.composeRandomFillOnly(s)
+                                                }
                                             }
-                                        }
-                                    },
-                                    scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Rhythm,
-                                    onToggleScorePlayback = {
-                                        scorePlaybackPart =
-                                            if (scorePlaybackPart == ScorePlaybackPart.Rhythm) null else ScorePlaybackPart.Rhythm
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                )
-                                PracticeCard(
-                                    title = "加花",
-                                    musicXml = selection?.fillXml.orEmpty(),
-                                    zoomScale = zoomScale,
-                                    gradientColors =
-                                        listOf(
-                                            Color(0xFF123B73),
-                                            Color(0xFF081A39),
-                                        ),
-                                    onShuffleThis = {
-                                        selection?.let { s ->
-                                            scope.launch {
-                                                selection = RandomPracticeComposer.composeRandomFillOnly(s)
-                                            }
-                                        }
-                                    },
-                                    scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Fill,
-                                    onToggleScorePlayback = {
-                                        scorePlaybackPart =
-                                            if (scorePlaybackPart == ScorePlaybackPart.Fill) null else ScorePlaybackPart.Fill
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                )
+                                        },
+                                        scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Fill,
+                                        onToggleScorePlayback = {
+                                            scorePlaybackPart =
+                                                if (scorePlaybackPart == ScorePlaybackPart.Fill) null else ScorePlaybackPart.Fill
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                }
                             }
                         }
                     }
+                    item { Spacer(Modifier.height(4.dp)) }
                 }
-                item { Spacer(Modifier.height(4.dp)) }
             }
         }
-    }
 
     BpmEditDialog(
         open = bpmDialogOpen,
@@ -328,7 +338,7 @@ fun MusicXmlScoreScreenContent(
         onDismiss = { bpmDialogOpen = false },
         onConfirm = { v ->
             if (v != null) {
-                bpm = v.coerceIn(10, 300)
+                bpm = v.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
             }
         },
     )

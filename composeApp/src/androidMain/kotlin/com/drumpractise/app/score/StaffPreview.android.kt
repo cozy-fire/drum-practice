@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,14 +23,14 @@ import kotlinx.coroutines.sync.withLock
 @Composable
 actual fun StaffPreview(
     musicXml: String,
-    zoomScale: Float,
     playbackHighlight: Boolean,
     modifier: Modifier,
 ) {
     var svgContent by remember { mutableStateOf("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>") }
     val renderMutex = remember { RenderMutexHolder.mutex }
+    val staffZoomScale by StaffZoomStore.staffZoomScale.collectAsState()
 
-    LaunchedEffect(musicXml, zoomScale) {
+    LaunchedEffect(musicXml, staffZoomScale) {
         val xml = musicXml.trim()
         if (xml.isEmpty()) {
             svgContent = "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"
@@ -57,7 +58,7 @@ actual fun StaffPreview(
                 return@withLock
             }
 
-            val scalePercent = (zoomScale.coerceIn(0.5f, 2.0f) * 100f).toInt().coerceIn(50, 200)
+            val scalePercent = (staffZoomScale.coerceIn(0.5f, 2.0f) * 100f).toInt().coerceIn(50, 200)
             tk.setOptions("""{"scale": $scalePercent}""")
             tk.redoLayout()
             svgContent = tk.renderToSVG(1)

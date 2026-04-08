@@ -63,20 +63,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.theme.DrumAccentBeat
-import drum_practice.composeapp.generated.resources.Res
-import drum_practice.composeapp.generated.resources.metronome_note_four_sixteenth_selected
-import drum_practice.composeapp.generated.resources.metronome_note_four_sixteenth_unselected
-import drum_practice.composeapp.generated.resources.metronome_note_quarter_unselected
-import drum_practice.composeapp.generated.resources.metronome_note_quarter_selected
-import drum_practice.composeapp.generated.resources.metronome_note_two_eighth_selected
-import drum_practice.composeapp.generated.resources.metronome_note_two_eighth_unselected
+import drumhero.composeapp.generated.resources.Res
+import drumhero.composeapp.generated.resources.metronome_note_four_sixteenth_selected
+import drumhero.composeapp.generated.resources.metronome_note_four_sixteenth_unselected
+import drumhero.composeapp.generated.resources.metronome_note_quarter_unselected
+import drumhero.composeapp.generated.resources.metronome_note_quarter_selected
+import drumhero.composeapp.generated.resources.metronome_note_two_eighth_selected
+import drumhero.composeapp.generated.resources.metronome_note_two_eighth_unselected
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.atan2
 import kotlin.math.roundToInt
 
 private const val BPM_DIAL_COMMIT_DEBOUNCE_MS = 500L
+
+private fun bpmTitle(): String = "BPM (${MetronomeConst.BPM_MIN}–${MetronomeConst.BPM_MAX})"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,7 +150,7 @@ fun MetronomeScreen(
             Spacer(Modifier.height(8.dp))
             BpmDial(
                 displayBpm = dialPreviewBpm ?: bpm,
-                onDialPreviewChange = { dialPreviewBpm = it.coerceIn(10, 300) },
+                onDialPreviewChange = { dialPreviewBpm = it.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) },
                 onRingDragStart = {
                     commitJob?.cancel()
                     commitJob = null
@@ -157,7 +160,7 @@ fun MetronomeScreen(
                     commitJob =
                         scope.launch {
                             delay(BPM_DIAL_COMMIT_DEBOUNCE_MS)
-                            val v = (dialPreviewBpm ?: bpm).coerceIn(10, 300)
+                            val v = (dialPreviewBpm ?: bpm).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
                             bpm = v
                             dialPreviewBpm = null
                             commitJob = null
@@ -258,7 +261,7 @@ fun MetronomeScreen(
     if (bpmDialogOpen) {
         AlertDialog(
             onDismissRequest = { bpmDialogOpen = false },
-            title = { Text("BPM (10–300)") },
+            title = { Text(bpmTitle()) },
             text = {
                 OutlinedTextField(
                     value = bpmDraft,
@@ -273,7 +276,7 @@ fun MetronomeScreen(
                     onClick = {
                         commitJob?.cancel()
                         commitJob = null
-                        val v = bpmDraft.toIntOrNull()?.coerceIn(10, 300) ?: bpm
+                        val v = bpmDraft.toIntOrNull()?.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) ?: bpm
                         bpm = v
                         dialPreviewBpm = null
                         bpmDialogOpen = false
@@ -375,7 +378,7 @@ private fun BpmDial(
                         var deg = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
                         deg = (deg + 90f + 360f) % 360f
                         val fraction = deg / 360f
-                        onPreview.value((10 + fraction * 290).roundToInt())
+                        onPreview.value((MetronomeConst.BPM_MIN + fraction * MetronomeConst.BPM_RANGE).roundToInt())
                     },
                 )
             },
@@ -393,7 +396,8 @@ private fun BpmDial(
                 size = arcSize,
                 style = Stroke(width = stroke, cap = StrokeCap.Round),
             )
-            val sweep = (displayBpm - 10) / 290f * 360f
+            val sweep =
+                (displayBpm - MetronomeConst.BPM_MIN) / MetronomeConst.BPM_RANGE.toFloat() * 360f
             drawArc(
                 color = secondary,
                 startAngle = -90f,

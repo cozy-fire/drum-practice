@@ -64,19 +64,19 @@ object SeparationGenerator {
             addAll(
                 listOf(
                     combo(listOf(1, 2)),
-                    combo(listOf(1, 3)),
-                    combo(listOf(1, 4)),
                     combo(listOf(2, 3)),
-                    combo(listOf(2, 4)),
                     combo(listOf(3, 4)),
+                    combo(listOf(1, 4)),
+                    combo(listOf(1, 3)),
+                    combo(listOf(2, 4)),
                 ),
             )
             addAll(
                 listOf(
                     combo(listOf(1, 2, 3)),
-                    combo(listOf(1, 2, 4)),
-                    combo(listOf(1, 3, 4)),
                     combo(listOf(2, 3, 4)),
+                    combo(listOf(1, 3, 4)),
+                    combo(listOf(1, 2, 4)),
                 ),
             )
             add(combo(listOf(1, 2, 3, 4)))

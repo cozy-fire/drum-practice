@@ -32,10 +32,9 @@ import androidx.compose.ui.unit.dp
 import com.drumpractise.app.score.StaffPreview
 
 @Composable
-internal fun PracticeCard(
+internal fun RhythmicPracticeCard(
     title: String,
     musicXml: String,
-    zoomScale: Float,
     gradientColors: List<Color>,
     onShuffleThis: () -> Unit,
     scorePlaybackActive: Boolean,
@@ -134,7 +133,6 @@ internal fun PracticeCard(
                 ) {
                     StaffPreview(
                         musicXml = musicXml,
-                        zoomScale = zoomScale,
                         playbackHighlight = scorePlaybackActive,
                         modifier = Modifier.fillMaxSize(),
                     )

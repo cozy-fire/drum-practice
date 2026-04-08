@@ -11,6 +11,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.drumpractise.app.constance.MetronomeConst
 
 @Composable
 internal fun BpmEditDialog(
@@ -24,7 +25,7 @@ internal fun BpmEditDialog(
     if (!open) return
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("BPM (10–300)") },
+        title = { Text("BPM (${MetronomeConst.BPM_MIN}–${MetronomeConst.BPM_MAX})") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("当前：$currentBpm", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

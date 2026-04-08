@@ -63,7 +63,7 @@
     </defaults>
   <part-list>
     <score-part id="P1">
-      <part-name>Drum Set</part-name>
+      <part-name print-object="no">Drum Set</part-name>
       <score-instrument id="P1-I36">
         <instrument-name>Kick Drum</instrument-name>
         </score-instrument>
@@ -177,12 +177,9 @@
       <backup>
         <duration>4</duration>
         </backup>
-      <note default-x="62.19" default-y="-20">
-        <rest/>
+      <forward>
         <duration>2</duration>
-        <voice>2</voice>
-        <type>quarter</type>
-        </note>
+      </forward>
       <note default-x="109.62" default-y="-15">
         <unpitched>
           <display-step>C</display-step>
@@ -197,12 +194,9 @@
       <backup>
         <duration>4</duration>
         </backup>
-      <note default-x="62.19" default-y="-50">
-        <rest/>
+      <forward>
         <duration>1</duration>
-        <voice>3</voice>
-        <type>eighth</type>
-        </note>
+      </forward>
       <note default-x="85.91" default-y="-35">
         <unpitched>
           <display-step>F</display-step>

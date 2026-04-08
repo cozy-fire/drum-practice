@@ -1,9 +1,9 @@
 package com.drumpractise.app.score.components
 
-import drum_practice.composeapp.generated.resources.Res
-import drum_practice.composeapp.generated.resources.metronome_note_four_sixteenth_unselected
-import drum_practice.composeapp.generated.resources.metronome_note_quarter_unselected
-import drum_practice.composeapp.generated.resources.metronome_note_two_eighth_unselected
+import drumhero.composeapp.generated.resources.Res
+import drumhero.composeapp.generated.resources.metronome_note_four_sixteenth_unselected
+import drumhero.composeapp.generated.resources.metronome_note_quarter_unselected
+import drumhero.composeapp.generated.resources.metronome_note_two_eighth_unselected
 import org.jetbrains.compose.resources.DrawableResource
 
 internal fun divisorLabel(noteDivisor: Int): String =

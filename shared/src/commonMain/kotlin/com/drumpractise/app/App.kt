@@ -14,7 +14,7 @@ fun App() {
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("drum-practice", style = MaterialTheme.typography.headlineMedium)
+                Text("DrumHero", style = MaterialTheme.typography.headlineMedium)
             }
         }
     }

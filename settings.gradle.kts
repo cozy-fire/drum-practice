@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "drum-practice"
+rootProject.name = "DrumHero"
 include(":composeApp")

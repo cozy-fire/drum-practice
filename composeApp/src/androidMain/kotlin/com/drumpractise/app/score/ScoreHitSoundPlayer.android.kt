@@ -69,6 +69,8 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
     private val pcmByRawId = ConcurrentHashMap<Int, ShortArray>()
     private val warmedUp = AtomicBoolean(false)
 
+    override val supportsFiniteCompletion: Boolean = true
+
     override suspend fun warmup() =
         withContext(Dispatchers.IO) {
             if (!warmedUp.compareAndSet(false, true)) return@withContext
@@ -86,10 +88,20 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
         }
 
     override fun startPlayback(musicXml: String, bpm: Int) {
+        startPlaybackFinite(musicXml = musicXml, bpm = bpm, loopCount = Int.MAX_VALUE, onCompleted = null)
+    }
+
+    override fun startPlaybackFinite(
+        musicXml: String,
+        bpm: Int,
+        loopCount: Int,
+        onCompleted: (() -> Unit)?,
+    ) {
         stopPlayback()
         val xml = musicXml.trim()
         if (xml.isEmpty()) return
 
+        val loops = loopCount.coerceAtLeast(1)
         running = true
         loopFuture =
             executor.submit {
@@ -181,11 +193,20 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
 
                 var timeInLoop = 0.0
                 var nextEventIndex = 0
+                var loopsCompleted = 0
+                var completedNaturally = false
 
                 try {
                     while (running) {
+                        if (loopsCompleted >= loops) {
+                            completedNaturally = true
+                            break
+                        }
                         work.fill(0)
                         for (si in 0 until chunkSamples) {
+                            if (!running) break
+                            if (loopsCompleted >= loops) break
+
                             while (nextEventIndex < events.size && events[nextEventIndex].offsetSamples <= timeInLoop + 1e-6) {
                                 val evt = events[nextEventIndex]
                                 for (ins in evt.instrumentIds) {
@@ -219,6 +240,10 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                             if (timeInLoop >= loopLen) {
                                 timeInLoop -= loopLen
                                 nextEventIndex = 0
+                                loopsCompleted++
+                                if (loopsCompleted >= loops) {
+                                    break
+                                }
                             }
                         }
                         var woff = 0
@@ -228,6 +253,7 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                                 w == AudioTrack.ERROR_BAD_VALUE ||
                                 w == AudioTrack.ERROR_DEAD_OBJECT
                             ) {
+                                running = false
                                 break
                             }
                             if (w > 0) {
@@ -246,6 +272,15 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                     track.release()
                     if (pcmOutTrack === track) {
                         pcmOutTrack = null
+                    }
+                    // Ensure visible stop for any waiting coroutine
+                    val shouldNotify = completedNaturally && running
+                    running = false
+                    if (shouldNotify) {
+                        try {
+                            onCompleted?.invoke()
+                        } catch (_: Exception) {
+                        }
                     }
                 }
             }

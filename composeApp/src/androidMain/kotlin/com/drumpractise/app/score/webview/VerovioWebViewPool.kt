@@ -27,7 +27,7 @@ import kotlinx.coroutines.yield
  */
 object VerovioWebViewPool {
 
-    const val POOL_MAX_SIZE: Int = 3
+    const val POOL_MAX_SIZE: Int = 6
     const val POOL_WARM_MIN: Int = 1
     const val POOL_INITIAL_PREWARM: Int = 1
     private const val IDLE_TTL_MS: Long = 300_000L

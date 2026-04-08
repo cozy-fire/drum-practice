@@ -5,4 +5,5 @@ object AppRoutes {
     const val SETTINGS = "settings"
     const val METRONOME = "metronome"
     const val MUSIC_XML_SCORE = "music_xml_score"
+    const val SEPARATION_PRACTICE = "separation_practice"
 }

@@ -1,6 +1,6 @@
 package com.drumpractise.app.randompractice
 
-import drum_practice.composeapp.generated.resources.Res
+import drumhero.composeapp.generated.resources.Res
 
 data class PracticeComposeItem(
     val rhythmicPath: String,

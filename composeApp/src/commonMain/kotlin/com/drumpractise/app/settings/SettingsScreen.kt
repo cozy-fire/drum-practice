@@ -30,16 +30,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.drumpractise.app.constance.VerovioConfig
 import com.drumpractise.app.randompractice.RandomPracticeComposer
 import com.drumpractise.app.score.StaffPreview
+import com.drumpractise.app.score.StaffZoomStore
 import com.drumpractise.app.score.components.StaffZoomAdjustBar
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier) {
-    val zoomSteps = remember { List(10) { i -> 0.85f + 0.15f * i } }
-    val initialZoomIndex = remember { AppSettings.getStaffZoomIndex() ?: 2 }
+    val zoomSteps = remember { VerovioConfig.ZOOM_STEPS }
+    val initialZoomIndex =
+        remember {
+            val scale = AppSettings.getStaffZoomScale()
+            val idx = zoomSteps.indexOfFirst { kotlin.math.abs(it - scale) < 0.0001f }
+            (if (idx >= 0) idx else 2).coerceIn(0, zoomSteps.lastIndex)
+        }
     var zoomIndex by remember { mutableIntStateOf(initialZoomIndex.coerceIn(0, zoomSteps.lastIndex)) }
     val zoomScale = zoomSteps[zoomIndex]
 
@@ -82,7 +89,6 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             ) {
                 StaffPreview(
                     musicXml = previewXml,
-                    zoomScale = zoomScale,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -97,8 +103,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 onZoomIn = { zoomIndex = (zoomIndex + 1).coerceAtMost(zoomSteps.lastIndex) },
                 confirmText = "保存",
                 onConfirm = {
-                    AppSettings.setStaffZoomIndex(zoomIndex)
-                    AppSettings.setStaffZoomConfigured(true)
+                    StaffZoomStore.commitScale(zoomScale)
                     scope.launch { snackbarHostState.showSnackbar("保存成功") }
                 },
             )

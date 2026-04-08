@@ -12,7 +12,7 @@ data class SeparationConfig(
     companion object {
         fun default(): SeparationConfig =
             SeparationConfig(
-                points = setOf(1, 2),
+                points = setOf(1, 2, 3, 4),
                 loopCount = 4,
                 bpm = 110,
                 mode = Sequential,

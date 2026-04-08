@@ -28,10 +28,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import drum_practice.composeapp.generated.resources.Res
-import drum_practice.composeapp.generated.resources.workbench_metronome
-import drum_practice.composeapp.generated.resources.workbench_random_practice
+import drumhero.composeapp.generated.resources.Res
+import drumhero.composeapp.generated.resources.workbench_metronome
+import drumhero.composeapp.generated.resources.workbench_random_practice
+import drumhero.composeapp.generated.resources.workbench_separation_practice
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -39,6 +42,7 @@ import org.jetbrains.compose.resources.painterResource
 fun WorkbenchScreen(
     onOpenMetronome: () -> Unit,
     onOpenMusicXmlScore: () -> Unit,
+    onOpenSeparationPractice: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val features =
@@ -49,6 +53,7 @@ fun WorkbenchScreen(
                 icon = Res.drawable.workbench_metronome,
                 gradient = listOf(Color(0xFF5A2E84), Color(0xFF2B1655)),
                 onClick = onOpenMetronome,
+                iconSize = 60.dp
             ),
             WorkbenchFeature(
                 title = "随机练习",
@@ -56,6 +61,15 @@ fun WorkbenchScreen(
                 icon = Res.drawable.workbench_random_practice,
                 gradient = listOf(Color(0xFF224A88), Color(0xFF0F2347)),
                 onClick = onOpenMusicXmlScore,
+                iconSize = 60.dp
+            ),
+            WorkbenchFeature(
+                title = "手脚分离练习",
+                subtitle = "点位 · 循环 · 顺序/随机",
+                icon = Res.drawable.workbench_separation_practice,
+                gradient = listOf(Color(0xFF6C3AD8), Color(0xFF1E1340)),
+                onClick = onOpenSeparationPractice,
+                iconSize = 80.dp
             ),
         )
 
@@ -67,7 +81,7 @@ fun WorkbenchScreen(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("我的工作台", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text("首页", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
         Text("选择功能开始您的工作", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         LazyVerticalGrid(
@@ -89,6 +103,7 @@ private data class WorkbenchFeature(
     val icon: DrawableResource,
     val gradient: List<Color>,
     val onClick: () -> Unit,
+    val iconSize: Dp
 )
 
 @Composable
@@ -118,7 +133,7 @@ private fun WorkbenchFeatureTile(
                     Modifier
                         .clip(RoundedCornerShape(14.dp))
                         .padding(10.dp)
-                        .size(60.dp),
+                        .size(feature.iconSize),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(

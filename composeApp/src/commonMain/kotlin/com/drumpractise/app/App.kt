@@ -28,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.drumpractise.app.metronome.MetronomeScreen
 import com.drumpractise.app.navigation.AppRoutes
+import com.drumpractise.app.separationpractice.SeparationPracticeScreen
 import com.drumpractise.app.settings.SettingsScreen
 import com.drumpractise.app.score.MusicXmlScoreScreen
 import com.drumpractise.app.theme.AppTheme
@@ -103,6 +104,7 @@ fun App() {
                             WorkbenchScreen(
                                 onOpenMetronome = { navController.navigate(AppRoutes.METRONOME) },
                                 onOpenMusicXmlScore = { navController.navigate(AppRoutes.MUSIC_XML_SCORE) },
+                                onOpenSeparationPractice = { navController.navigate(AppRoutes.SEPARATION_PRACTICE) },
                             )
                         }
                         composable(AppRoutes.SETTINGS) { SettingsScreen() }
@@ -111,6 +113,9 @@ fun App() {
                         }
                         composable(AppRoutes.MUSIC_XML_SCORE) {
                             MusicXmlScoreScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable(AppRoutes.SEPARATION_PRACTICE) {
+                            SeparationPracticeScreen(onBack = { navController.popBackStack() })
                         }
                     }
                 }

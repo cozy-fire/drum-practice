@@ -1,5 +1,7 @@
 package com.drumpractise.app.score.musicxml
 
+import com.drumpractise.app.constance.MetronomeConst
+
 /**
  * 单个 loop 内一次击打时刻（与 [MusicXmlDrumTimelineParser] 的组对齐），单位：输出采样（如 48 kHz）。
  */
@@ -25,7 +27,7 @@ fun buildDrumScorePlaybackSchedule(
     pcmSampleRate: Int,
 ): DrumScorePlaybackSchedule? {
     if (parsed.groups.isEmpty()) return null
-    val bpmClamped = bpm.coerceIn(10, 300)
+    val bpmClamped = bpm.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
     val divisions = parsed.divisionsPerQuarter.coerceAtLeast(1)
     val samplesPerQuarter = pcmSampleRate * 60.0 / bpmClamped
     val events =
