@@ -64,8 +64,8 @@ fun WorkbenchScreen(
                 iconSize = 60.dp
             ),
             WorkbenchFeature(
-                title = "手脚分离练习",
-                subtitle = "点位 · 循环 · 顺序/随机",
+                title = "手脚分家练习",
+                subtitle = "多点位 · 顺序/随机练习",
                 icon = Res.drawable.workbench_separation_practice,
                 gradient = listOf(Color(0xFF6C3AD8), Color(0xFF1E1340)),
                 onClick = onOpenSeparationPractice,
@@ -82,7 +82,7 @@ fun WorkbenchScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("首页", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
-        Text("选择功能开始您的工作", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("选择功能开始您的练习", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 160.dp),
