@@ -6,10 +6,10 @@ import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 
 object SeparationGenerator {
     /**
-     * Generate items based on current config.
+     * Generate items based on current config. Each selected tier N includes all
+     * `separation_practice_N_*.musicxml` files (whitelist; compose resources cannot list dirs).
      *
-     * Note: random mode should only re-shuffle when caller updates [shuffleNonce]
-     * (e.g. on "确认设置"). This prevents UI jitter during draft edits.
+     * Random mode re-shuffles when caller updates [shuffleNonce] (e.g. on "确认设置").
      */
     fun generate(
         config: SeparationConfig,
@@ -18,69 +18,65 @@ object SeparationGenerator {
         val allowed = config.points.filter { it in 1..4 }.toSet()
         if (allowed.isEmpty()) return emptyList()
 
-        val combos = allKnownCombos().filter { it.points.all { p -> p in allowed } }
-        val ordered =
-            combos.sortedWith(
-                compareBy<Combo>({ it.points.size }, { it.points.joinToString("") }),
-            )
+        val paths =
+            allowed
+                .flatMap { tier -> filesByTier[tier].orEmpty() }
+                .distinct()
 
-        val list =
-            ordered.map { c ->
-                val id = c.points.joinToString("")
-                val title = when (c.points.size) {
-                    1 -> "点位 ${c.points.single()}"
-                    else -> "点位 ${c.points.joinToString(" + ")}"
-                }
+        val items =
+            paths.map { path ->
+                val tier = tierFromPath(path) ?: 1
+                val suffix = path.substringAfterLast('_').removeSuffix(".musicxml")
                 SeparationItem(
-                    id = id,
-                    title = title,
-                    musicXmlPath = c.musicXmlPath,
+                    id = path.removePrefix("separation_practice/").removeSuffix(".musicxml"),
+                    title = "$tier 个点位 · $suffix",
+                    musicXmlPath = path,
                 )
             }
 
         return when (config.mode) {
-            SeparationPracticeMode.Sequential -> list
-            SeparationPracticeMode.Random -> list.shuffled(kotlin.random.Random(shuffleNonce))
+            SeparationPracticeMode.Sequential -> items
+            SeparationPracticeMode.Random -> items.shuffled(kotlin.random.Random(shuffleNonce))
         }
     }
 
-    private data class Combo(
-        val points: List<Int>,
-        val musicXmlPath: String,
-    )
-
-    private fun allKnownCombos(): List<Combo> {
-        // Paths are relative to composeResources/files/
-        fun combo(points: List<Int>): Combo {
-            val sorted = points.sorted()
-            val key = sorted.joinToString("")
-            val path =
-                "separation_practice/separation_practice_${sorted.size}_$key.musicxml"
-            return Combo(points = sorted, musicXmlPath = path)
-        }
-
-        return buildList {
-            addAll((1..4).map { combo(listOf(it)) })
-            addAll(
-                listOf(
-                    combo(listOf(1, 2)),
-                    combo(listOf(2, 3)),
-                    combo(listOf(3, 4)),
-                    combo(listOf(1, 4)),
-                    combo(listOf(1, 3)),
-                    combo(listOf(2, 4)),
-                ),
-            )
-            addAll(
-                listOf(
-                    combo(listOf(1, 2, 3)),
-                    combo(listOf(2, 3, 4)),
-                    combo(listOf(1, 3, 4)),
-                    combo(listOf(1, 2, 4)),
-                ),
-            )
-            add(combo(listOf(1, 2, 3, 4)))
-        }
+    private fun tierFromPath(path: String): Int? {
+        val name = path.substringAfterLast('/')
+        val prefix = "separation_practice_"
+        if (!name.startsWith(prefix)) return null
+        val rest = name.removePrefix(prefix)
+        return rest.substringBefore('_').toIntOrNull()
     }
+
+    /** Paths relative to composeResources/files/ */
+    private val filesByTier: Map<Int, List<String>> =
+        mapOf(
+            1 to
+                listOf(
+                    "separation_practice/separation_practice_1_1.musicxml",
+                    "separation_practice/separation_practice_1_2.musicxml",
+                    "separation_practice/separation_practice_1_3.musicxml",
+                    "separation_practice/separation_practice_1_4.musicxml",
+                ),
+            2 to
+                listOf(
+                    "separation_practice/separation_practice_2_12.musicxml",
+                    "separation_practice/separation_practice_2_23.musicxml",
+                    "separation_practice/separation_practice_2_34.musicxml",
+                    "separation_practice/separation_practice_2_14.musicxml",
+                    "separation_practice/separation_practice_2_13.musicxml",
+                    "separation_practice/separation_practice_2_24.musicxml",
+                ),
+            3 to
+                listOf(
+                    "separation_practice/separation_practice_3_123.musicxml",
+                    "separation_practice/separation_practice_3_234.musicxml",
+                    "separation_practice/separation_practice_3_134.musicxml",
+                    "separation_practice/separation_practice_3_124.musicxml",
+                ),
+            4 to
+                listOf(
+                    "separation_practice/separation_practice_4_1234.musicxml",
+                ),
+        )
 }
-

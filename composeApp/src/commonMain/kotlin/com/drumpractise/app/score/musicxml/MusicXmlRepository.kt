@@ -1,8 +1,10 @@
 package com.drumpractise.app.score.musicxml
 
 import drumhero.composeapp.generated.resources.Res
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 /**
  * Loads MusicXML from composeResources/files/ with a small in-memory LRU cache.
@@ -28,9 +30,11 @@ object MusicXmlRepository {
         }
 
         val xml =
-            runCatching {
-                Res.readBytes("files/$relativePath").decodeToString().trim()
-            }.getOrElse { "" }
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    Res.readBytes("files/$relativePath").decodeToString().trim()
+                }.getOrElse { "" }
+            }
 
         mutex.withLock {
             lru[relativePath] = xml

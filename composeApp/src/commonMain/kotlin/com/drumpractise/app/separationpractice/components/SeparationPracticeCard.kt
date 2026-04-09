@@ -74,6 +74,7 @@ fun SeparationPracticeCard(
                     musicXml = musicXml,
                     playbackHighlight = highlighted,
                     modifier = Modifier.fillMaxWidth().height(128.dp),
+                    staffPreviewCacheKey = item.musicXmlPath,
                 )
             }
         }

@@ -1,16 +1,19 @@
 package com.drumpractise.app.separationpractice.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
@@ -29,15 +32,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.separationpractice.model.SeparationConfig
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
+import com.drumpractise.app.separationpractice.util.separationExampleImagesForTier
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun SeparationPracticeSettingsContent(
@@ -49,64 +57,73 @@ fun SeparationPracticeSettingsContent(
 ) {
     val scroll = rememberScrollState()
     Column(
-        modifier = modifier.fillMaxWidth().verticalScroll(scroll),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier.fillMaxWidth().fillMaxHeight(),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(scroll),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text("练习设置", style = MaterialTheme.typography.titleLarge, color = Color.White)
-            IconButton(onClick = onClose) {
-                Icon(Icons.Filled.Close, contentDescription = "关闭", tint = Color.White)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("练习设置", style = MaterialTheme.typography.titleLarge, color = Color.White)
+                IconButton(onClick = onClose) {
+                    Icon(Icons.Filled.Close, contentDescription = "关闭", tint = Color.White)
+                }
             }
-        }
 
-        SectionTitle("练习点位")
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            (1..4).forEach { idx ->
-                val checked = config.points.contains(idx)
-                SelectRow(
-                    checked = checked,
-                    label = "点位 $idx",
-                    onToggle = {
-                        val next = if (checked) config.points - idx else config.points + idx
-                        onConfigChange(config.copy(points = next))
-                    },
-                )
+            SectionTitle("练习点位")
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                (1..4).forEach { idx ->
+                    val checked = config.points.contains(idx)
+                    SelectRow(
+                        tier = idx,
+                        checked = checked,
+                        onToggle = {
+                            val next = if (checked) config.points - idx else config.points + idx
+                            onConfigChange(config.copy(points = next))
+                        },
+                    )
+                }
             }
+
+            SectionTitle("循环次数")
+            StepperRow(
+                valueText = "${config.loopCount.coerceAtLeast(1)} 次",
+                onMinus = { onConfigChange(config.copy(loopCount = (config.loopCount - 1).coerceAtLeast(1))) },
+                onPlus = { onConfigChange(config.copy(loopCount = (config.loopCount + 1).coerceAtMost(99))) },
+            )
+
+            SectionTitle("节拍速度 (BPM)")
+            StepperRow(
+                valueText = "${config.bpm.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)} BPM",
+                onMinus = { onConfigChange(config.copy(bpm = (config.bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))) },
+                onPlus = { onConfigChange(config.copy(bpm = (config.bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))) },
+            )
+            Slider(
+                value = config.bpm.toFloat().coerceIn(MetronomeConst.BPM_MIN.toFloat(), MetronomeConst.BPM_MAX.toFloat()),
+                onValueChange = { onConfigChange(config.copy(bpm = it.toInt().coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))) },
+                valueRange = MetronomeConst.BPM_MIN.toFloat()..MetronomeConst.BPM_MAX.toFloat(),
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            SectionTitle("练习模式")
+            ModeRow(
+                mode = config.mode,
+                onModeChange = { onConfigChange(config.copy(mode = it)) },
+            )
         }
-
-        SectionTitle("循环次数")
-        StepperRow(
-            valueText = "${config.loopCount.coerceAtLeast(1)} 次",
-            onMinus = { onConfigChange(config.copy(loopCount = (config.loopCount - 1).coerceAtLeast(1))) },
-            onPlus = { onConfigChange(config.copy(loopCount = (config.loopCount + 1).coerceAtMost(99))) },
-        )
-
-        SectionTitle("节拍速度 (BPM)")
-        StepperRow(
-            valueText = "${config.bpm.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)} BPM",
-            onMinus = { onConfigChange(config.copy(bpm = (config.bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))) },
-            onPlus = { onConfigChange(config.copy(bpm = (config.bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))) },
-        )
-        Slider(
-            value = config.bpm.toFloat().coerceIn(MetronomeConst.BPM_MIN.toFloat(), MetronomeConst.BPM_MAX.toFloat()),
-            onValueChange = { onConfigChange(config.copy(bpm = it.toInt().coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))) },
-            valueRange = MetronomeConst.BPM_MIN.toFloat()..MetronomeConst.BPM_MAX.toFloat(),
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        SectionTitle("练习模式")
-        ModeRow(
-            mode = config.mode,
-            onModeChange = { onConfigChange(config.copy(mode = it)) },
-        )
 
         Button(
             onClick = onConfirm,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
         ) {
             Text("确认设置")
         }
@@ -125,12 +142,14 @@ private fun SectionTitle(text: String) {
 
 @Composable
 private fun SelectRow(
+    tier: Int,
     checked: Boolean,
-    label: String,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(14.dp)
+    val exampleScroll = rememberScrollState()
+    val exampleImages = remember(tier) { separationExampleImagesForTier(tier) }
     Column(
         modifier =
             modifier
@@ -140,11 +159,10 @@ private fun SelectRow(
                     shape,
                 )
                 .border(1.dp, Color.White.copy(alpha = 0.10f), shape)
-                .clickable(onClick = onToggle)
                 .padding(horizontal = 14.dp, vertical = 12.dp),
     ) {
         Row(
-            verticalAlignment = Alignment.Top,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.wrapContentWidth(),
         ) {
             Checkbox(
@@ -153,24 +171,32 @@ private fun SelectRow(
                 colors = CheckboxDefaults.colors(checkedColor = Color(0xFF7C3AED), checkmarkColor = Color.White),
             )
             Text(
-                label,
+                "${tier} 个点位",
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
+                modifier = Modifier.clickable(onClick = onToggle),
             )
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 6.dp)
+                    .horizontalScroll(exampleScroll),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            repeat(6) {
-                Box(
+            for (drawable in exampleImages) {
+                Image(
+                    painter = painterResource(drawable),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
                     modifier =
                         Modifier
-                            .width(60.dp)
                             .height(40.dp)
-                            .background(Color.White.copy(alpha = 0.10f), RoundedCornerShape(6.dp)),
+                            .width(60.dp)
+                            .clip(RoundedCornerShape(15.dp)),
                 )
             }
         }

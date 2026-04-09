@@ -14,55 +14,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.drumpractise.app.score.nativenotation.VerovioScoreRuntime
 import com.drumpractise.app.score.webview.VerovioWebViewPool
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 @Composable
 actual fun StaffPreview(
     musicXml: String,
     playbackHighlight: Boolean,
     modifier: Modifier,
+    staffPreviewCacheKey: String?,
 ) {
     var svgContent by remember { mutableStateOf("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>") }
-    val renderMutex = remember { RenderMutexHolder.mutex }
     val staffZoomScale by StaffZoomStore.staffZoomScale.collectAsState()
 
-    LaunchedEffect(musicXml, staffZoomScale) {
-        val xml = musicXml.trim()
-        if (xml.isEmpty()) {
-            svgContent = "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"
-            return@LaunchedEffect
-        }
-
-        var tk = VerovioScoreRuntime.toolkitOrNull()
-        var waitTicks = 0
-        if (tk == null) {
-            while (waitTicks < 200 && tk == null) {
-                delay(16)
-                tk = VerovioScoreRuntime.toolkitOrNull()
-                waitTicks++
-            }
-        }
-        if (tk == null) {
-            svgContent = "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"
-            return@LaunchedEffect
-        }
-
-        renderMutex.withLock {
-            val ok = tk.loadData(xml)
-            if (!ok) {
-                svgContent = "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"
-                return@withLock
-            }
-
-            val scalePercent = (staffZoomScale.coerceIn(0.5f, 2.0f) * 100f).toInt().coerceIn(50, 200)
-            tk.setOptions("""{"scale": $scalePercent}""")
-            tk.redoLayout()
-            svgContent = tk.renderToSVG(1)
-        }
+    LaunchedEffect(musicXml, staffZoomScale, staffPreviewCacheKey) {
+        svgContent =
+            StaffPreviewSvgCache.renderToSvgOrCached(
+                musicXml = musicXml,
+                staffPreviewCacheKey = staffPreviewCacheKey,
+                staffZoomScale = staffZoomScale,
+            )
     }
 
     val html =
@@ -127,8 +97,4 @@ actual fun StaffPreview(
                 .clip(staffShape)
                 .border(width = borderWidth, color = borderColor, shape = staffShape),
     )
-}
-
-private object RenderMutexHolder {
-    val mutex = Mutex()
 }

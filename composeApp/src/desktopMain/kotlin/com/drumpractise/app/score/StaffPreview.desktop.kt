@@ -15,6 +15,7 @@ actual fun StaffPreview(
     musicXml: String,
     playbackHighlight: Boolean,
     modifier: Modifier,
+    staffPreviewCacheKey: String?,
 ) {
     val staffShape = RoundedCornerShape(20.dp)
     val borderWidth = if (playbackHighlight) 3.dp else 1.dp

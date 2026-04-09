@@ -10,6 +10,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.drumpractise.app.R
+import com.drumpractise.app.constance.hitVolumeForInstrument
 import com.drumpractise.app.data.drumApplicationContext
 import com.drumpractise.app.metronome.RawResourceMonoPcmDecoder
 import com.drumpractise.app.score.musicxml.MusicXmlDrumTimelineParser
@@ -18,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -38,7 +40,6 @@ private const val DRUM_HIT_PCM_SAMPLE_RATE = 48_000
 private const val PCM_BYTES_PER_MONO_FRAME = 2
 private const val MIN_CHUNK_SAMPLES = 128
 private const val MAX_CHUNK_SAMPLES = 256
-private const val HIT_VOLUME = 0.9f
 
 private data class ActiveVoice(
     val pcm: ShortArray,
@@ -68,6 +69,9 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
 
     private val pcmByRawId = ConcurrentHashMap<Int, ShortArray>()
     private val warmedUp = AtomicBoolean(false)
+
+    /** 每次 [stopPlayback] 或新一段 [startPlaybackFinite] 递增；旧 executor 任务 finally 中不得清掉新一段的 [running]。 */
+    private val playbackGeneration = AtomicLong(0L)
 
     override val supportsFiniteCompletion: Boolean = true
 
@@ -102,28 +106,20 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
         if (xml.isEmpty()) return
 
         val loops = loopCount.coerceAtLeast(1)
+        val myGeneration = playbackGeneration.incrementAndGet()
         running = true
         loopFuture =
             executor.submit {
-                val ctx = drumApplicationContext()
+                try {
                 val parsed = MusicXmlDrumTimelineParser.parse(xml)
                 val schedule =
                     buildDrumScorePlaybackSchedule(parsed, bpm, DRUM_HIT_PCM_SAMPLE_RATE)
                         ?: run {
-                            running = false
+                            if (playbackGeneration.get() == myGeneration) {
+                                running = false
+                            }
                             return@submit
                         }
-
-                val rawIdsNeeded =
-                    schedule.events
-                        .flatMap { it.instrumentIds }
-                        .map { rawForInstrument(it) }
-                        .toSet()
-                for (rawId in rawIdsNeeded) {
-                    pcmByRawId.computeIfAbsent(rawId) {
-                        RawResourceMonoPcmDecoder.decodeMonoS16Resampled(ctx, it, DRUM_HIT_PCM_SAMPLE_RATE)
-                    }
-                }
 
                 val minBytes =
                     AudioTrack.getMinBufferSize(
@@ -132,7 +128,9 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                         AudioFormat.ENCODING_PCM_16BIT,
                     )
                 if (minBytes <= 0) {
-                    running = false
+                    if (playbackGeneration.get() == myGeneration) {
+                        running = false
+                    }
                     return@submit
                 }
                 val bufferBytes = minBytes
@@ -163,7 +161,9 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                 val track = trackBuilder.build()
                 if (track.state != AudioTrack.STATE_INITIALIZED) {
                     track.release()
-                    running = false
+                    if (playbackGeneration.get() == myGeneration) {
+                        running = false
+                    }
                     return@submit
                 }
                 pcmOutTrack = track
@@ -205,7 +205,6 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                         work.fill(0)
                         for (si in 0 until chunkSamples) {
                             if (!running) break
-                            if (loopsCompleted >= loops) break
 
                             while (nextEventIndex < events.size && events[nextEventIndex].offsetSamples <= timeInLoop + 1e-6) {
                                 val evt = events[nextEventIndex]
@@ -213,7 +212,7 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                                     val rid = rawForInstrument(ins)
                                     val pcm = pcmByRawId[rid] ?: continue
                                     if (pcm.isNotEmpty()) {
-                                        active.add(ActiveVoice(pcm, 0, HIT_VOLUME))
+                                        active.add(ActiveVoice(pcm, 0, hitVolumeForInstrument(ins)))
                                     }
                                 }
                                 nextEventIndex++
@@ -253,7 +252,9 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                                 w == AudioTrack.ERROR_BAD_VALUE ||
                                 w == AudioTrack.ERROR_DEAD_OBJECT
                             ) {
-                                running = false
+                                if (playbackGeneration.get() == myGeneration) {
+                                    running = false
+                                }
                                 break
                             }
                             if (w > 0) {
@@ -274,19 +275,28 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                         pcmOutTrack = null
                     }
                     // Ensure visible stop for any waiting coroutine
-                    val shouldNotify = completedNaturally && running
-                    running = false
-                    if (shouldNotify) {
-                        try {
-                            onCompleted?.invoke()
-                        } catch (_: Exception) {
+                    val stillCurrent = playbackGeneration.get() == myGeneration
+                    if (stillCurrent) {
+                        val shouldNotify = completedNaturally && running
+                        running = false
+                        if (shouldNotify) {
+                            try {
+                                onCompleted?.invoke()
+                            } catch (_: Exception) {
+                            }
                         }
+                    }
+                }
+                } catch (t: Throwable) {
+                    if (playbackGeneration.get() == myGeneration) {
+                        running = false
                     }
                 }
             }
     }
 
     override fun stopPlayback() {
+        playbackGeneration.incrementAndGet()
         running = false
         pcmOutTrack?.run {
             try {
