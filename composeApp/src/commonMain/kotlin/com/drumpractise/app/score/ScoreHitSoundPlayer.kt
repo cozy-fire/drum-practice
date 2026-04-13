@@ -12,7 +12,7 @@ interface ScoreHitSoundPlayer {
     val supportsFiniteCompletion: Boolean
         get() = false
 
-    fun startPlayback(musicXml: String, bpm: Int)
+    fun startPlayback(musicXml: String, bpm: Int, weakNoteVolumeScale: Float? = null)
 
     /**
      * Play the given score for exactly [loopCount] loops and then call [onCompleted] (if supported).
@@ -24,8 +24,9 @@ interface ScoreHitSoundPlayer {
         bpm: Int,
         loopCount: Int,
         onCompleted: (() -> Unit)? = null,
+        weakNoteVolumeScale: Float? = null,
     ) {
-        startPlayback(musicXml, bpm)
+        startPlayback(musicXml, bpm, weakNoteVolumeScale)
     }
 
     fun stopPlayback()
@@ -38,12 +39,15 @@ interface ScoreHitSoundPlayer {
 object NoOpScoreHitSoundPlayer : ScoreHitSoundPlayer {
     override val supportsFiniteCompletion: Boolean = false
 
-    override fun startPlayback(musicXml: String, bpm: Int) {}
+    override fun startPlayback(musicXml: String, bpm: Int, weakNoteVolumeScale: Float?) {}
 
     override fun stopPlayback() {}
 
     override suspend fun warmup() {}
 }
+
+/** Process-wide singleton used by [ScorePlaybackController] and [rememberScoreHitSoundPlayer]. */
+expect fun globalScoreHitSoundPlayer(): ScoreHitSoundPlayer
 
 @Composable
 expect fun rememberScoreHitSoundPlayer(): ScoreHitSoundPlayer

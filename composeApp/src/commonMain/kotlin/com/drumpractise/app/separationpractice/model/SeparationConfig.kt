@@ -5,7 +5,8 @@ import com.drumpractise.app.separationpractice.model.SeparationPracticeMode.Sequ
 
 data class SeparationConfig(
     val points: Set<Int>,
-    val loopCount: Int,
+    val cardLoopCount: Int,
+    val listLoopCount: Int,
     val bpm: Int,
     val mode: SeparationPracticeMode,
 ) {
@@ -13,7 +14,8 @@ data class SeparationConfig(
         fun default(): SeparationConfig =
             SeparationConfig(
                 points = setOf(1, 2, 3, 4),
-                loopCount = 4,
+                cardLoopCount = 4,
+                listLoopCount = 1,
                 bpm = 110,
                 mode = Sequential,
             )

@@ -9,6 +9,8 @@ data class DrumNoteHit(
     val displayOctave: Int,
     /** MusicXML `<instrument id="P1-I38"/>`；缺失时为空串，播放走默认采样 */
     val instrumentId: String,
+    /** `<notations><articulations><accent/>` 等；用于逐音强弱倍率（见 [buildDrumScorePlaybackSchedule]）。 */
+    val isAccent: Boolean,
 )
 
 data class DrumHitGroup(
@@ -31,8 +33,21 @@ data class ParsedDrumScore(
 }
 
 object MusicXmlDrumTimelineParser {
+    /**
+     * 对 `musicXml.trim()` 后的字符串做解析结果缓存，避免同一乐谱重复解析（如队列展开后同路径多次出现）。
+     * 以完整 XML 文本为键，内存占用与调用方传入的字符串生命周期相关。
+     */
+    private val parseCache = mutableMapOf<String, ParsedDrumScore>()
+
     fun parse(musicXml: String): ParsedDrumScore {
         val trimmed = musicXml.trim()
+        parseCache[trimmed]?.let { return it }
+        val parsed = parseWithoutCache(trimmed)
+        parseCache[trimmed] = parsed
+        return parsed
+    }
+
+    private fun parseWithoutCache(trimmed: String): ParsedDrumScore {
         if (trimmed.isEmpty()) return ParsedDrumScore(4, emptyList())
 
         val part = extractFirstPart(trimmed) ?: return ParsedDrumScore(4, emptyList())
@@ -145,8 +160,16 @@ object MusicXmlDrumTimelineParser {
                 ?: return null
         val instrumentId =
             Regex("""<instrument\s+id="([^"]+)"""").find(noteXml)?.groupValues?.get(1).orEmpty()
-        return DrumNoteHit(displayStep = step, displayOctave = oct, instrumentId = instrumentId)
+        return DrumNoteHit(
+            displayStep = step,
+            displayOctave = oct,
+            instrumentId = instrumentId,
+            isAccent = noteXmlHasAccentArticulation(noteXml),
+        )
     }
+
+    private fun noteXmlHasAccentArticulation(noteXml: String): Boolean =
+        noteXml.contains("<accent") || noteXml.contains("<strong-accent")
 
     private fun extractFirstPart(xml: String): String? {
         val start = xml.indexOf("<part ")

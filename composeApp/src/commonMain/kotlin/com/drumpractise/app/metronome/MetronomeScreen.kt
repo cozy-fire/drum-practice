@@ -99,6 +99,7 @@ fun MetronomeScreen(
         onDispose {
             commitJob?.cancel()
             commitJob = null
+            engine.stop()
         }
     }
 

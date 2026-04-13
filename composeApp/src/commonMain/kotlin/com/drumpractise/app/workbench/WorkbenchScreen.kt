@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import drumhero.composeapp.generated.resources.Res
+import drumhero.composeapp.generated.resources.workbench_accent_shift
 import drumhero.composeapp.generated.resources.workbench_metronome
 import drumhero.composeapp.generated.resources.workbench_random_practice
 import drumhero.composeapp.generated.resources.workbench_separation_practice
@@ -43,6 +44,7 @@ fun WorkbenchScreen(
     onOpenMetronome: () -> Unit,
     onOpenMusicXmlScore: () -> Unit,
     onOpenSeparationPractice: () -> Unit,
+    onOpenAccentShiftPractice: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val features =
@@ -53,7 +55,6 @@ fun WorkbenchScreen(
                 icon = Res.drawable.workbench_metronome,
                 gradient = listOf(Color(0xFF5A2E84), Color(0xFF2B1655)),
                 onClick = onOpenMetronome,
-                iconSize = 60.dp
             ),
             WorkbenchFeature(
                 title = "随机练习",
@@ -61,7 +62,6 @@ fun WorkbenchScreen(
                 icon = Res.drawable.workbench_random_practice,
                 gradient = listOf(Color(0xFF224A88), Color(0xFF0F2347)),
                 onClick = onOpenMusicXmlScore,
-                iconSize = 60.dp
             ),
             WorkbenchFeature(
                 title = "手脚分家练习",
@@ -69,7 +69,13 @@ fun WorkbenchScreen(
                 icon = Res.drawable.workbench_separation_practice,
                 gradient = listOf(Color(0xFF6C3AD8), Color(0xFF1E1340)),
                 onClick = onOpenSeparationPractice,
-                iconSize = 80.dp
+            ),
+            WorkbenchFeature(
+                title = "重音移位练习",
+                subtitle = "重音位置 · 击打技法 · 跟练",
+                icon = Res.drawable.workbench_accent_shift,
+                gradient = listOf(Color(0xFF7C3AED), Color(0xFF3B1C71)),
+                onClick = onOpenAccentShiftPractice,
             ),
         )
 
@@ -103,7 +109,6 @@ private data class WorkbenchFeature(
     val icon: DrawableResource,
     val gradient: List<Color>,
     val onClick: () -> Unit,
-    val iconSize: Dp
 )
 
 @Composable
@@ -133,7 +138,7 @@ private fun WorkbenchFeatureTile(
                     Modifier
                         .clip(RoundedCornerShape(14.dp))
                         .padding(10.dp)
-                        .size(feature.iconSize),
+                        .size(60.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(

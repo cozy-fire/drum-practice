@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +51,9 @@ import com.drumpractise.app.score.components.TopActionButtonStyle
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 
+private const val RandomRhythmQueueItemId = "random_rhythm"
+private const val RandomFillQueueItemId = "random_fill"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MusicXmlScoreScreenContent(
@@ -71,17 +75,26 @@ fun MusicXmlScoreScreenContent(
     val scope = rememberCoroutineScope()
 
     var scorePlaybackPart by remember { mutableStateOf<ScorePlaybackPart?>(null) }
-    val hitSound = rememberScoreHitSoundPlayer()
+    val scorePlaybackUi by ScorePlaybackController.uiState.collectAsState()
+    val rhythmPlaybackActive =
+        when (val s = scorePlaybackUi) {
+            is ScorePlaybackUiState.Playing -> s.itemId == RandomRhythmQueueItemId
+            else -> false
+        }
+    val fillPlaybackActive =
+        when (val s = scorePlaybackUi) {
+            is ScorePlaybackUiState.Playing -> s.itemId == RandomFillQueueItemId
+            else -> false
+        }
 
-    val zoomSteps = remember { VerovioConfig.ZOOM_STEPS }
     val initialZoomIndex =
         remember {
             val scale = AppSettings.getStaffZoomScale()
-            val idx = zoomSteps.indexOfFirst { kotlin.math.abs(it - scale) < 0.0001f }
-            (if (idx >= 0) idx else 2).coerceIn(0, zoomSteps.lastIndex)
+            val idx = VerovioConfig.ZOOM_STEPS.indexOfFirst { kotlin.math.abs(it - scale) < 0.0001f }
+            (if (idx >= 0) idx else 2).coerceIn(0, VerovioConfig.ZOOM_STEPS.lastIndex)
         }
-    var zoomIndex by remember { mutableIntStateOf(initialZoomIndex.coerceIn(0, zoomSteps.lastIndex)) }
-    val zoomScale = zoomSteps[zoomIndex]
+    var zoomIndex by remember { mutableIntStateOf(initialZoomIndex.coerceIn(0, VerovioConfig.ZOOM_STEPS.lastIndex)) }
+    val zoomScale = VerovioConfig.ZOOM_STEPS[zoomIndex]
     var showZoomSetupBar by remember { mutableStateOf(!AppSettings.getStaffZoomConfigured()) }
 
     LaunchedEffect(showZoomSetupBar, zoomScale) {
@@ -94,10 +107,6 @@ fun MusicXmlScoreScreenContent(
 
     LaunchedEffect(Unit) {
         selection = RandomPracticeComposer.composeRandom()
-    }
-
-    LaunchedEffect(hitSound) {
-        hitSound.warmup()
     }
 
     LaunchedEffect(playing) {
@@ -120,7 +129,7 @@ fun MusicXmlScoreScreenContent(
     LaunchedEffect(scorePlaybackPart, bpm, selection?.rhythmicXml, selection?.fillXml) {
         val part = scorePlaybackPart
         if (part == null) {
-            hitSound.stopPlayback()
+            ScorePlaybackController.stop()
             return@LaunchedEffect
         }
         val xml =
@@ -129,15 +138,39 @@ fun MusicXmlScoreScreenContent(
                 ScorePlaybackPart.Fill -> selection?.fillXml
             }?.trim().orEmpty()
         if (xml.isEmpty()) {
-            hitSound.stopPlayback()
+            ScorePlaybackController.stop()
             return@LaunchedEffect
         }
 
-        hitSound.startPlayback(xml, bpm)
+        val itemId =
+            when (part) {
+                ScorePlaybackPart.Rhythm -> RandomRhythmQueueItemId
+                ScorePlaybackPart.Fill -> RandomFillQueueItemId
+            }
+        ScorePlaybackController.playQueue(
+            items =
+                listOf(
+                    MusicXmlQueueItem(
+                        id = itemId,
+                        musicXmlPath = "",
+                        inlineMusicXml = xml,
+                    ),
+                ),
+            bpm = bpm,
+            loopCount = Int.MAX_VALUE,
+            startIndex = 0,
+        )
         try {
             awaitCancellation()
         } finally {
-            hitSound.stopPlayback()
+            ScorePlaybackController.stop()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            engine.stop()
+            ScorePlaybackController.stop()
         }
     }
 
@@ -172,9 +205,9 @@ fun MusicXmlScoreScreenContent(
                     StaffZoomAdjustBar(
                         zoomPercent = (zoomScale * 100).toInt(),
                         canZoomOut = zoomIndex > 0,
-                        canZoomIn = zoomIndex < zoomSteps.lastIndex,
+                        canZoomIn = zoomIndex < VerovioConfig.ZOOM_STEPS.lastIndex,
                         onZoomOut = { zoomIndex = (zoomIndex - 1).coerceAtLeast(0) },
-                        onZoomIn = { zoomIndex = (zoomIndex + 1).coerceAtMost(zoomSteps.lastIndex) },
+                        onZoomIn = { zoomIndex = (zoomIndex + 1).coerceAtMost(VerovioConfig.ZOOM_STEPS.lastIndex) },
                         confirmText = "确定",
                         onConfirm = {
                             StaffZoomStore.commitScale(zoomScale)
@@ -243,7 +276,7 @@ fun MusicXmlScoreScreenContent(
                                                 }
                                             }
                                         },
-                                        scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Rhythm,
+                                        scorePlaybackActive = rhythmPlaybackActive,
                                         onToggleScorePlayback = {
                                             scorePlaybackPart =
                                                 if (scorePlaybackPart == ScorePlaybackPart.Rhythm) null else ScorePlaybackPart.Rhythm
@@ -265,7 +298,7 @@ fun MusicXmlScoreScreenContent(
                                                 }
                                             }
                                         },
-                                        scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Fill,
+                                        scorePlaybackActive = fillPlaybackActive,
                                         onToggleScorePlayback = {
                                             scorePlaybackPart =
                                                 if (scorePlaybackPart == ScorePlaybackPart.Fill) null else ScorePlaybackPart.Fill
@@ -293,7 +326,7 @@ fun MusicXmlScoreScreenContent(
                                                 }
                                             }
                                         },
-                                        scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Rhythm,
+                                        scorePlaybackActive = rhythmPlaybackActive,
                                         onToggleScorePlayback = {
                                             scorePlaybackPart =
                                                 if (scorePlaybackPart == ScorePlaybackPart.Rhythm) null else ScorePlaybackPart.Rhythm
@@ -315,7 +348,7 @@ fun MusicXmlScoreScreenContent(
                                                 }
                                             }
                                         },
-                                        scorePlaybackActive = scorePlaybackPart == ScorePlaybackPart.Fill,
+                                        scorePlaybackActive = fillPlaybackActive,
                                         onToggleScorePlayback = {
                                             scorePlaybackPart =
                                                 if (scorePlaybackPart == ScorePlaybackPart.Fill) null else ScorePlaybackPart.Fill

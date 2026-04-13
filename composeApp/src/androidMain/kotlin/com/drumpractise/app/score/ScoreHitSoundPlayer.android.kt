@@ -6,9 +6,6 @@ import android.media.AudioTrack
 import android.os.Build
 import android.os.Process
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import com.drumpractise.app.R
 import com.drumpractise.app.constance.hitVolumeForInstrument
 import com.drumpractise.app.data.drumApplicationContext
@@ -47,15 +44,12 @@ private data class ActiveVoice(
     val vol: Float,
 )
 
+private val globalAndroidScoreHitSoundPlayer by lazy { AndroidScoreHitSoundPlayer() }
+
+actual fun globalScoreHitSoundPlayer(): ScoreHitSoundPlayer = globalAndroidScoreHitSoundPlayer
+
 @Composable
-actual fun rememberScoreHitSoundPlayer(): ScoreHitSoundPlayer {
-    val context = LocalContext.current
-    val player = remember(context) { AndroidScoreHitSoundPlayer() }
-    DisposableEffect(player) {
-        onDispose { player.release() }
-    }
-    return player
-}
+actual fun rememberScoreHitSoundPlayer(): ScoreHitSoundPlayer = globalScoreHitSoundPlayer()
 
 private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
     private var executor = Executors.newSingleThreadExecutor()
@@ -91,8 +85,14 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
             }
         }
 
-    override fun startPlayback(musicXml: String, bpm: Int) {
-        startPlaybackFinite(musicXml = musicXml, bpm = bpm, loopCount = Int.MAX_VALUE, onCompleted = null)
+    override fun startPlayback(musicXml: String, bpm: Int, weakNoteVolumeScale: Float?) {
+        startPlaybackFinite(
+            musicXml = musicXml,
+            bpm = bpm,
+            loopCount = Int.MAX_VALUE,
+            onCompleted = null,
+            weakNoteVolumeScale = weakNoteVolumeScale,
+        )
     }
 
     override fun startPlaybackFinite(
@@ -100,6 +100,7 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
         bpm: Int,
         loopCount: Int,
         onCompleted: (() -> Unit)?,
+        weakNoteVolumeScale: Float?,
     ) {
         stopPlayback()
         val xml = musicXml.trim()
@@ -113,7 +114,12 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
                 try {
                 val parsed = MusicXmlDrumTimelineParser.parse(xml)
                 val schedule =
-                    buildDrumScorePlaybackSchedule(parsed, bpm, DRUM_HIT_PCM_SAMPLE_RATE)
+                    buildDrumScorePlaybackSchedule(
+                        parsed,
+                        bpm,
+                        DRUM_HIT_PCM_SAMPLE_RATE,
+                        weakNoteVolumeScale = weakNoteVolumeScale,
+                    )
                         ?: run {
                             if (playbackGeneration.get() == myGeneration) {
                                 running = false
@@ -208,11 +214,13 @@ private class AndroidScoreHitSoundPlayer() : ScoreHitSoundPlayer {
 
                             while (nextEventIndex < events.size && events[nextEventIndex].offsetSamples <= timeInLoop + 1e-6) {
                                 val evt = events[nextEventIndex]
-                                for (ins in evt.instrumentIds) {
+                                for (h in evt.hits) {
+                                    val ins = h.instrumentId
                                     val rid = rawForInstrument(ins)
                                     val pcm = pcmByRawId[rid] ?: continue
                                     if (pcm.isNotEmpty()) {
-                                        active.add(ActiveVoice(pcm, 0, hitVolumeForInstrument(ins)))
+                                        val vol = hitVolumeForInstrument(ins) * h.dynamicsMul
+                                        active.add(ActiveVoice(pcm, 0, vol))
                                     }
                                 }
                                 nextEventIndex++

@@ -23,7 +23,7 @@ object SeparationGenerator {
                 .flatMap { tier -> filesByTier[tier].orEmpty() }
                 .distinct()
 
-        val items =
+        val baseItems =
             paths.map { path ->
                 val tier = tierFromPath(path) ?: 1
                 val suffix = path.substringAfterLast('_').removeSuffix(".musicxml")
@@ -34,9 +34,26 @@ object SeparationGenerator {
                 )
             }
 
-        return when (config.mode) {
-            SeparationPracticeMode.Sequential -> items
-            SeparationPracticeMode.Random -> items.shuffled(kotlin.random.Random(shuffleNonce))
+        val ordered =
+            when (config.mode) {
+                SeparationPracticeMode.Sequential -> baseItems
+                SeparationPracticeMode.Random -> baseItems.shuffled(kotlin.random.Random(shuffleNonce))
+            }
+
+        val loops = config.listLoopCount.coerceAtLeast(1)
+        if (loops == 1) return ordered
+
+        return buildList(capacity = ordered.size * loops) {
+            for (round in 1..loops) {
+                for (base in ordered) {
+                    add(
+                        base.copy(
+                            id = "${base.id}#r$round",
+                            title = "${base.title}（第 $round/$loops 轮）",
+                        ),
+                    )
+                }
+            }
         }
     }
 

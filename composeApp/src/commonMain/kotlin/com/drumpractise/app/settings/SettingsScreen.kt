@@ -40,19 +40,22 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier) {
-    val zoomSteps = remember { VerovioConfig.ZOOM_STEPS }
     val initialZoomIndex =
         remember {
             val scale = AppSettings.getStaffZoomScale()
-            val idx = zoomSteps.indexOfFirst { kotlin.math.abs(it - scale) < 0.0001f }
-            (if (idx >= 0) idx else 2).coerceIn(0, zoomSteps.lastIndex)
+            val idx = VerovioConfig.ZOOM_STEPS.indexOfFirst { kotlin.math.abs(it - scale) < 0.0001f }
+            (if (idx >= 0) idx else 2).coerceIn(0, VerovioConfig.ZOOM_STEPS.lastIndex)
         }
-    var zoomIndex by remember { mutableIntStateOf(initialZoomIndex.coerceIn(0, zoomSteps.lastIndex)) }
-    val zoomScale = zoomSteps[zoomIndex]
+    var zoomIndex by remember { mutableIntStateOf(initialZoomIndex.coerceIn(0, VerovioConfig.ZOOM_STEPS.lastIndex)) }
+    val zoomScale = VerovioConfig.ZOOM_STEPS[zoomIndex]
 
     var previewXml by remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
         previewXml = RandomPracticeComposer.composeForSettings().rhythmicXml
+    }
+
+    LaunchedEffect(zoomScale) {
+        StaffZoomStore.setPreviewScale(zoomScale)
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -98,9 +101,9 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             StaffZoomAdjustBar(
                 zoomPercent = (zoomScale * 100).toInt(),
                 canZoomOut = zoomIndex > 0,
-                canZoomIn = zoomIndex < zoomSteps.lastIndex,
+                canZoomIn = zoomIndex < VerovioConfig.ZOOM_STEPS.lastIndex,
                 onZoomOut = { zoomIndex = (zoomIndex - 1).coerceAtLeast(0) },
-                onZoomIn = { zoomIndex = (zoomIndex + 1).coerceAtMost(zoomSteps.lastIndex) },
+                onZoomIn = { zoomIndex = (zoomIndex + 1).coerceAtMost(VerovioConfig.ZOOM_STEPS.lastIndex) },
                 confirmText = "保存",
                 onConfirm = {
                     StaffZoomStore.commitScale(zoomScale)

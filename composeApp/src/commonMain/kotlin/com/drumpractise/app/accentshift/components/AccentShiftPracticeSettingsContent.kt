@@ -1,26 +1,22 @@
-package com.drumpractise.app.separationpractice.components
+package com.drumpractise.app.accentshift.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -37,22 +33,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.drumpractise.app.accentshift.AccentShiftPracticeColors
+import com.drumpractise.app.accentshift.model.AccentShiftPracticeConfig
+import com.drumpractise.app.accentshift.util.accentBeatPatternsForTier
 import com.drumpractise.app.constance.MetronomeConst
-import com.drumpractise.app.separationpractice.model.SeparationConfig
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
-import com.drumpractise.app.separationpractice.util.separationExampleImagesForTier
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun SeparationPracticeSettingsContent(
-    config: SeparationConfig,
-    onConfigChange: (SeparationConfig) -> Unit,
+fun AccentShiftPracticeSettingsContent(
+    config: AccentShiftPracticeConfig,
+    onConfigChange: (AccentShiftPracticeConfig) -> Unit,
     onClose: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
@@ -81,15 +75,15 @@ fun SeparationPracticeSettingsContent(
                 }
             }
 
-            SectionTitle("练习点位")
+            SectionTitle("练习档位")
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                (1..4).forEach { idx ->
-                    val checked = config.points.contains(idx)
-                    SelectRow(
-                        tier = idx,
+                (1..4).forEach { tier ->
+                    val checked = config.points.contains(tier)
+                    TierSelectRow(
+                        tier = tier,
                         checked = checked,
                         onToggle = {
-                            val next = if (checked) config.points - idx else config.points + idx
+                            val next = if (checked) config.points - tier else config.points + tier
                             onConfigChange(config.copy(points = next))
                         },
                     )
@@ -150,7 +144,7 @@ private fun SectionTitle(text: String) {
 }
 
 @Composable
-private fun SelectRow(
+private fun TierSelectRow(
     tier: Int,
     checked: Boolean,
     onToggle: () -> Unit,
@@ -158,13 +152,13 @@ private fun SelectRow(
 ) {
     val shape = RoundedCornerShape(14.dp)
     val exampleScroll = rememberScrollState()
-    val exampleImages = remember(tier) { separationExampleImagesForTier(tier) }
+    val patterns = remember(tier) { accentBeatPatternsForTier(tier) }
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .background(
-                    if (checked) Color(0xFF7C3AED).copy(alpha = 0.35f) else Color.White.copy(alpha = 0.08f),
+                    if (checked) AccentShiftPracticeColors.accent.copy(alpha = 0.35f) else Color.White.copy(alpha = 0.08f),
                     shape,
                 )
                 .border(1.dp, Color.White.copy(alpha = 0.10f), shape)
@@ -177,10 +171,14 @@ private fun SelectRow(
             Checkbox(
                 checked = checked,
                 onCheckedChange = { onToggle() },
-                colors = CheckboxDefaults.colors(checkedColor = Color(0xFF7C3AED), checkmarkColor = Color.White),
+                colors =
+                    CheckboxDefaults.colors(
+                        checkedColor = AccentShiftPracticeColors.accent,
+                        checkmarkColor = Color.White,
+                    ),
             )
             Text(
-                "${tier} 个点位",
+                "$tier 个重音拍",
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
                 modifier = Modifier.clickable(onClick = onToggle),
@@ -196,18 +194,40 @@ private fun SelectRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            for (drawable in exampleImages) {
-                Image(
-                    painter = painterResource(drawable),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier =
-                        Modifier
-                            .height(40.dp)
-                            .width(60.dp)
-                            .clip(RoundedCornerShape(15.dp)),
-                )
+            for (beats in patterns) {
+                AccentBeatStripMini(accentedBeats = beats)
             }
+        }
+    }
+}
+
+@Composable
+private fun AccentBeatStripMini(
+    accentedBeats: List<Int>,
+    modifier: Modifier = Modifier,
+) {
+    val accentSet = accentedBeats.toSet()
+    Row(
+        modifier =
+            modifier
+                .height(36.dp)
+                .background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(10.dp))
+                .border(1.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(10.dp))
+                .padding(horizontal = 6.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        for (beat in 1..4) {
+            val on = beat in accentSet
+            Box(
+                modifier =
+                    Modifier
+                        .size(width = 14.dp, height = 22.dp)
+                        .background(
+                            if (on) AccentShiftPracticeColors.accent.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.12f),
+                            RoundedCornerShape(4.dp),
+                        ),
+            )
         }
     }
 }
@@ -281,7 +301,7 @@ private fun ModeItem(
         modifier =
             Modifier
                 .background(
-                    if (selected) Color(0xFF7C3AED).copy(alpha = 0.38f) else Color.White.copy(alpha = 0.10f),
+                    if (selected) AccentShiftPracticeColors.accent.copy(alpha = 0.38f) else Color.White.copy(alpha = 0.10f),
                     shape,
                 )
                 .border(1.dp, Color.White.copy(alpha = 0.10f), shape)
@@ -289,4 +309,3 @@ private fun ModeItem(
                 .padding(horizontal = 14.dp, vertical = 10.dp),
     )
 }
-

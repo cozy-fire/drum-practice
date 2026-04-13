@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.drumpractise.app.metronome.LocalMetronomeEngine
 import com.drumpractise.app.metronome.MetronomeEngine
+import com.drumpractise.app.score.ScorePlaybackController
 import com.drumpractise.app.score.warmUpVerovioScoreEngine
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -32,6 +33,7 @@ import com.drumpractise.app.separationpractice.SeparationPracticeScreen
 import com.drumpractise.app.settings.SettingsScreen
 import com.drumpractise.app.score.MusicXmlScoreScreen
 import com.drumpractise.app.theme.AppTheme
+import com.drumpractise.app.accentshift.AccentShiftPracticeScreen
 import com.drumpractise.app.workbench.WorkbenchScreen
 
 @Composable
@@ -42,6 +44,9 @@ fun App() {
     }
     LaunchedEffect(Unit) {
         warmUpVerovioScoreEngine()
+    }
+    LaunchedEffect(Unit) {
+        ScorePlaybackController.warmup()
     }
 
     AppTheme {
@@ -105,6 +110,7 @@ fun App() {
                                 onOpenMetronome = { navController.navigate(AppRoutes.METRONOME) },
                                 onOpenMusicXmlScore = { navController.navigate(AppRoutes.MUSIC_XML_SCORE) },
                                 onOpenSeparationPractice = { navController.navigate(AppRoutes.SEPARATION_PRACTICE) },
+                                onOpenAccentShiftPractice = { navController.navigate(AppRoutes.ACCENT_SHIFT_PRACTICE) },
                             )
                         }
                         composable(AppRoutes.SETTINGS) { SettingsScreen() }
@@ -116,6 +122,9 @@ fun App() {
                         }
                         composable(AppRoutes.SEPARATION_PRACTICE) {
                             SeparationPracticeScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable(AppRoutes.ACCENT_SHIFT_PRACTICE) {
+                            AccentShiftPracticeScreen(onBack = { navController.popBackStack() })
                         }
                     }
                 }

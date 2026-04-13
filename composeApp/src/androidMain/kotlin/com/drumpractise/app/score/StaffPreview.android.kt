@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.drumpractise.app.score.webview.VerovioWebViewPool
+import androidx.core.graphics.toColorInt
 
 @Composable
 actual fun StaffPreview(
@@ -88,7 +89,7 @@ actual fun StaffPreview(
     AndroidView(
         factory = { VerovioWebViewPool.acquire() },
         update = { webView ->
-            webView.setBackgroundColor(android.graphics.Color.parseColor("#F3E7C3"))
+            webView.setBackgroundColor("#F3E7C3".toColorInt())
             webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
         },
         onRelease = { webView -> VerovioWebViewPool.release(webView) },

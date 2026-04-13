@@ -13,8 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -60,15 +63,12 @@ import com.drumpractise.app.separationpractice.generator.SeparationGenerator
 import com.drumpractise.app.separationpractice.model.SeparationConfig
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 import com.drumpractise.app.score.MusicXmlQueueItem
-import com.drumpractise.app.score.ScorePlaybackSession
-import com.drumpractise.app.score.ScoreQueuePlayer
-import com.drumpractise.app.score.ScoreQueueState
+import com.drumpractise.app.score.ScorePlaybackController
+import com.drumpractise.app.score.ScorePlaybackUiState
 import com.drumpractise.app.score.StaffZoomStore
 import com.drumpractise.app.score.prefetchStaffPreviewSvgCache
-import com.drumpractise.app.score.rememberScoreHitSoundPlayer
 import com.drumpractise.app.score.components.StaffZoomAdjustBar
 import com.drumpractise.app.settings.AppSettings
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -84,12 +84,8 @@ fun SeparationPracticeScreen(
                 initialValue = androidx.compose.material3.DrawerValue.Closed,
             )
         }
-    val hitSound = rememberScoreHitSoundPlayer()
-    var playing by remember { mutableStateOf(false) }
-    var playingIndex by remember { mutableIntStateOf(-1) }
-    var pausedResumeIndex by remember { mutableStateOf<Int?>(null) }
-    val queuePlayer = remember(hitSound) { ScoreQueuePlayer(hitSound) }
-    var session by remember { mutableStateOf<ScorePlaybackSession?>(null) }
+    val playbackUi by ScorePlaybackController.uiState.collectAsState()
+    val playing = playbackUi is ScorePlaybackUiState.Playing
 
     val savedConfig = remember { AppSettings.getSeparationConfig() }
     var config by remember { mutableStateOf(savedConfig) }
@@ -131,29 +127,15 @@ fun SeparationPracticeScreen(
 
     var isWideLayout by remember { mutableStateOf(false) }
 
-    val highlightIndex by remember {
-        derivedStateOf {
-            when {
-                playing && playingIndex >= 0 -> playingIndex
-                pausedResumeIndex != null -> pausedResumeIndex!!
-                else -> -1
-            }
+    val highlightIndex =
+        when (val s = playbackUi) {
+            is ScorePlaybackUiState.Playing -> s.index
+            is ScorePlaybackUiState.Paused -> s.resumeIndex
+            else -> -1
         }
-    }
 
-    val listState = rememberLazyListState()
-
-    DisposableEffect(hitSound) {
-        onDispose {
-            session?.stop()
-            session = null
-            hitSound.stopPlayback()
-        }
-    }
-
-    LaunchedEffect(hitSound) {
-        hitSound.warmup()
-    }
+    val columnState = rememberLazyListState()
+    val rowState = rememberLazyListState()
 
     LaunchedEffect(items, staffZoomScale) {
         val scalePercent =
@@ -166,82 +148,39 @@ fun SeparationPracticeScreen(
 
     LaunchedEffect(highlightIndex, items.size) {
         if (highlightIndex >= 0 && highlightIndex < items.size) {
-            listState.animateScrollToItem(highlightIndex)
-        }
-    }
-
-    LaunchedEffect(session) {
-        val s = session ?: run {
-            playing = false
-            playingIndex = -1
-            return@LaunchedEffect
-        }
-        s.state.collect { st ->
-            when (st) {
-                is ScoreQueueState.Playing -> {
-                    playing = true
-                    playingIndex = st.index
-                    pausedResumeIndex = null
-                }
-                ScoreQueueState.Ended -> {
-                    playing = false
-                    playingIndex = -1
-                    pausedResumeIndex = null
-                }
-                ScoreQueueState.Stopped -> {
-                    playing = false
-                    playingIndex = -1
-                }
-                ScoreQueueState.Idle -> {
-                    playing = false
-                    playingIndex = -1
-                }
-                is ScoreQueueState.Error -> {
-                    playing = false
-                    playingIndex = -1
-                    pausedResumeIndex = null
-                }
-            }
+            val targetState = if (isWideLayout) rowState else columnState
+            targetState.animateScrollToItem(highlightIndex)
         }
     }
 
     fun resetPlayback() {
-        session?.stop()
-        session = null
-        hitSound.stopPlayback()
-        playing = false
-        playingIndex = -1
-        pausedResumeIndex = null
+        ScorePlaybackController.stop()
     }
 
     fun pausePlayback() {
-        val s = session ?: return
-        val st = s.state.value
-        if (st !is ScoreQueueState.Playing) return
-        pausedResumeIndex = st.index
-        s.stop()
-        session = null
-        playing = false
-        playingIndex = -1
+        ScorePlaybackController.pause()
     }
 
     fun startPlayback() {
         if (items.isEmpty()) return
-        session?.stop()
-        session = null
-        hitSound.stopPlayback()
-        playing = false
-        playingIndex = -1
-        val startIdx = (pausedResumeIndex ?: 0).coerceIn(0, items.lastIndex)
-        scope.launch { hitSound.warmup() }
-        session =
-            queuePlayer.playQueue(
-                items = items.map { MusicXmlQueueItem(id = it.id, musicXmlPath = it.musicXmlPath) },
-                bpm = config.bpm,
-                loopCount = config.loopCount.coerceAtLeast(1),
-                pcmSampleRate = 48_000,
-                startIndex = startIdx,
-            )
+        val startIdx =
+            when (val s = ScorePlaybackController.uiState.value) {
+                is ScorePlaybackUiState.Paused -> s.resumeIndex
+                else -> 0
+            }.coerceIn(0, items.lastIndex)
+        ScorePlaybackController.playQueue(
+            items = items.map { MusicXmlQueueItem(id = it.id, musicXmlPath = it.musicXmlPath) },
+            bpm = config.bpm,
+            loopCount = config.cardLoopCount.coerceAtLeast(1),
+            pcmSampleRate = 48_000,
+            startIndex = startIdx,
+        )
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            resetPlayback()
+        }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -269,9 +208,8 @@ fun SeparationPracticeScreen(
                                 if (config.mode == SeparationPracticeMode.Random) shuffleNonce++
                                 scope.launch {
                                     drawerState.close()
-                                    if (!isWideLayout) {
-                                        listState.animateScrollToItem(0)
-                                    }
+                                    val targetState = if (isWideLayout) rowState else columnState
+                                    targetState.animateScrollToItem(0)
                                 }
                             },
                             modifier = Modifier.padding(16.dp),
@@ -288,10 +226,7 @@ fun SeparationPracticeScreen(
                             title = { Text("手脚分家练习") },
                             navigationIcon = {
                                 IconButton(
-                                    onClick = {
-                                        resetPlayback()
-                                        onBack()
-                                    },
+                                    onClick = onBack,
                                 ) {
                                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
                                 }
@@ -385,7 +320,8 @@ fun SeparationPracticeScreen(
                         ) {
                             SeparationPracticeInfo(
                                 bpm = config.bpm,
-                                loopCount = config.loopCount,
+                                listLoopCount = config.listLoopCount,
+                                cardLoopCount = config.cardLoopCount,
                                 modeLabel = config.mode.label,
                                 modifier = Modifier.fillMaxWidth(),
                             )
@@ -395,11 +331,22 @@ fun SeparationPracticeScreen(
                                     isWideLayout = maxWidth >= 600.dp
                                 }
                                 val wide = this.maxWidth >= 600.dp
-                                if (!wide) {
+                                if (items.isEmpty()) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Text(
+                                            text = "请在右上角设置中勾选练习点位",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+                                        )
+                                    }
+                                } else if (!wide) {
                                     LazyColumn(
                                         modifier = Modifier.fillMaxSize(),
                                         verticalArrangement = Arrangement.spacedBy(14.dp),
-                                        state = listState,
+                                        state = columnState,
                                     ) {
                                         itemsIndexed(items, key = { _, it -> it.id }) { idx, item ->
                                             SeparationPracticeCard(
@@ -410,15 +357,16 @@ fun SeparationPracticeScreen(
                                         }
                                     }
                                 } else {
-                                    Row(
+                                    LazyRow(
                                         modifier = Modifier.fillMaxSize(),
                                         horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                        state = rowState,
                                     ) {
-                                        items.forEachIndexed { idx, item ->
+                                        itemsIndexed(items, key = { _, it -> it.id }) { idx, item ->
                                             SeparationPracticeCard(
                                                 item = item,
                                                 highlighted = highlightIndex == idx,
-                                                modifier = Modifier.weight(1f),
+                                                modifier = Modifier.width(maxWidth * 0.4f).wrapContentHeight(),
                                             )
                                         }
                                     }

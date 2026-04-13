@@ -2,7 +2,6 @@
 .gradle/
 build/
 **/build/
-
 # Android
 local.properties
 captures/
@@ -22,3 +21,4 @@ Thumbs.db
 # Debug session NDJSON (local only)
 debug-*.log
 /composeApp/.cxx/
+/.cursor/
