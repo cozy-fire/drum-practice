@@ -2,7 +2,6 @@
 
 package com.drumpractise.app.accentshift
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -25,16 +24,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
@@ -58,6 +50,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,18 +58,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.drumpractise.app.accentshift.components.AccentShiftHandImageSlot
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeCard
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeInfo
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeSettingsContent
+import com.drumpractise.app.accentshift.components.HandImageDisplayMode
 import com.drumpractise.app.constance.VerovioConfig
 import com.drumpractise.app.score.StaffZoomStore
 import com.drumpractise.app.score.components.StaffZoomAdjustBar
@@ -90,21 +82,10 @@ import com.drumpractise.app.score.ScorePlaybackController
 import com.drumpractise.app.score.ScorePlaybackUiState
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 import com.drumpractise.app.settings.AppSettings
+import drumhero.composeapp.generated.resources.Res
+import drumhero.composeapp.generated.resources.accent_shift_hand_static
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
-
-private data class InstructionSlide(
-    val title: String,
-    val description: String,
-)
-
-private val instructionSlides =
-    listOf(
-        InstructionSlide("全击", "大幅度挥动，充分利用手腕力量"),
-        InstructionSlide("技法说明 2", "占位文案，后续可替换为具体说明。"),
-        InstructionSlide("技法说明 3", "占位文案，后续可替换为具体说明。"),
-        InstructionSlide("技法说明 4", "占位文案，后续可替换为具体说明。"),
-    )
 
 @Composable
 fun AccentShiftPracticeScreen(
@@ -161,8 +142,7 @@ fun AccentShiftPracticeScreen(
         selectedTrackIndex = selectedTrackIndex.coerceIn(0, (trackItems.size - 1).coerceAtLeast(0))
     }
 
-    // 手型 GIF 时间轴（逻辑已就绪，UI 接入时读取 handMotionTimeline）
-    @Suppress("UNUSED_VARIABLE")
+    // 手型 GIF 时间轴（后续与 HandImageDisplayMode / 播放进度对齐）
     var handMotionTimeline by remember { mutableStateOf(HandMotionTimeline(emptyList())) }
     LaunchedEffect(trackItems, config.bpm, config.cardLoopCount) {
         handMotionTimeline =
@@ -215,8 +195,6 @@ fun AccentShiftPracticeScreen(
         }
     }
 
-    val pagerState = rememberPagerState(pageCount = { instructionSlides.size })
-
     val hasTracks = trackItems.isNotEmpty()
 
     fun resetPlayback() {
@@ -261,20 +239,9 @@ fun AccentShiftPracticeScreen(
         ) {
             Spacer(Modifier.height(12.dp))
             InstructionRow(
-                pagerState = pagerState,
-                slides = instructionSlides,
-                onPagerPrev = {
-                    scope.launch {
-                        val target = (pagerState.currentPage - 1).coerceAtLeast(0)
-                        pagerState.animateScrollToPage(target)
-                    }
-                },
-                onPagerNext = {
-                    scope.launch {
-                        val target = (pagerState.currentPage + 1).coerceAtMost(instructionSlides.lastIndex)
-                        pagerState.animateScrollToPage(target)
-                    }
-                },
+                handMotionTimeline = handMotionTimeline,
+                leftHandMode = HandImageDisplayMode.Static(Res.drawable.accent_shift_hand_static),
+                rightHandMode = HandImageDisplayMode.Static(Res.drawable.accent_shift_hand_static),
             )
             Spacer(Modifier.height(10.dp))
             AccentShiftPracticeInfo(
@@ -518,144 +485,34 @@ fun AccentShiftPracticeScreen(
 
 @Composable
 private fun InstructionRow(
-    pagerState: PagerState,
-    slides: List<InstructionSlide>,
-    onPagerPrev: () -> Unit,
-    onPagerNext: () -> Unit,
+    handMotionTimeline: HandMotionTimeline,
+    leftHandMode: HandImageDisplayMode,
+    rightHandMode: HandImageDisplayMode,
 ) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(250.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        HandHintBox(label = "L", handContentDescription = "左手提示占位")
-        HorizontalPager(
-            state = pagerState,
+    key(handMotionTimeline.totalDurationMs, handMotionTimeline.segments.size) {
+        Row(
             modifier =
                 Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(AccentShiftPracticeColors.surfaceCard),
-        ) { page ->
-            val slide = slides[page]
-            Column(
+                    .fillMaxWidth()
+                    .height(250.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            AccentShiftHandImageSlot(
+                mode = leftHandMode,
+                accessibilityDescription = "左手手型",
                 modifier =
                     Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 10.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    text = slide.title,
-                    color = AccentShiftPracticeColors.accent,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(Modifier.height(4.dp))
-                Icon(
-                    Icons.Filled.ArrowUpward,
-                    contentDescription = null,
-                    tint = AccentShiftPracticeColors.textMuted,
-                    modifier = Modifier.size(28.dp),
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = slide.description,
-                    color = AccentShiftPracticeColors.textMuted,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 16.sp,
-                    maxLines = 2,
-                )
-                Spacer(Modifier.height(6.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    IconButton(onClick = onPagerPrev, modifier = Modifier.size(36.dp)) {
-                        Icon(
-                            Icons.Filled.ChevronLeft,
-                            contentDescription = "上一页说明",
-                            tint = AccentShiftPracticeColors.textPrimary,
-                            modifier = Modifier.size(22.dp),
-                        )
-                    }
-                    Text(
-                        text = "${page + 1}/${slides.size}",
-                        color = AccentShiftPracticeColors.textMuted,
-                        fontSize = 12.sp,
-                    )
-                    IconButton(onClick = onPagerNext, modifier = Modifier.size(36.dp)) {
-                        Icon(
-                            Icons.Filled.ChevronRight,
-                            contentDescription = "下一页说明",
-                            tint = AccentShiftPracticeColors.textPrimary,
-                            modifier = Modifier.size(22.dp),
-                        )
-                    }
-                }
-                Spacer(Modifier.height(4.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    slides.indices.forEach { i ->
-                        val dotColor =
-                            if (i == page) {
-                                AccentShiftPracticeColors.accent
-                            } else {
-                                AccentShiftPracticeColors.textMuted.copy(alpha = 0.35f)
-                            }
-                        Box(
-                            modifier =
-                                Modifier
-                                    .size(size = if (i == page) 8.dp else 6.dp)
-                                    .clip(CircleShape)
-                                    .background(dotColor),
-                        )
-                    }
-                }
-            }
-        }
-        HandHintBox(label = "R", handContentDescription = "右手提示占位")
-    }
-}
-
-@Composable
-private fun HandHintBox(
-    label: String,
-    handContentDescription: String,
-) {
-    Surface(
-        modifier =
-            Modifier
-                .width(36.dp)
-                .fillMaxHeight()
-                .semantics { contentDescription = handContentDescription }
-                .clip(RoundedCornerShape(14.dp)),
-        color = AccentShiftPracticeColors.surfaceCard,
-        shape = RoundedCornerShape(14.dp),
-    ) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = label,
-                color = AccentShiftPracticeColors.textPrimary,
-                fontWeight = FontWeight.Bold,
+                        .weight(1F)
+                        .fillMaxHeight(),
             )
-            Text(
-                text = "↑",
-                color = AccentShiftPracticeColors.textMuted,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(top = 4.dp),
+            AccentShiftHandImageSlot(
+                mode = rightHandMode,
+                accessibilityDescription = "右手手型",
+                modifier =
+                    Modifier
+                        .weight(1F)
+                        .fillMaxHeight(),
             )
         }
     }

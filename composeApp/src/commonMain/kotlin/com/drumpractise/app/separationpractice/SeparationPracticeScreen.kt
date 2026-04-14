@@ -26,16 +26,18 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -49,7 +51,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,7 +61,7 @@ import com.drumpractise.app.separationpractice.components.SeparationPracticeCard
 import com.drumpractise.app.separationpractice.components.SeparationPracticeInfo
 import com.drumpractise.app.separationpractice.components.SeparationPracticeSettingsContent
 import com.drumpractise.app.separationpractice.generator.SeparationGenerator
-import com.drumpractise.app.separationpractice.model.SeparationConfig
+import com.drumpractise.app.separationpractice.model.SeparationPracticeLevel
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 import com.drumpractise.app.score.MusicXmlQueueItem
 import com.drumpractise.app.score.ScorePlaybackController
@@ -72,6 +73,7 @@ import com.drumpractise.app.settings.AppSettings
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeparationPracticeScreen(
     onBack: () -> Unit,
@@ -87,12 +89,13 @@ fun SeparationPracticeScreen(
     val playbackUi by ScorePlaybackController.uiState.collectAsState()
     val playing = playbackUi is ScorePlaybackUiState.Playing
 
-    val savedConfig = remember { AppSettings.getSeparationConfig() }
-    var config by remember { mutableStateOf(savedConfig) }
-    var draftConfig by remember { mutableStateOf(savedConfig) }
+    val initialState = remember { AppSettings.getSeparationPracticeState() }
+    var separationState by remember { mutableStateOf(initialState) }
+    var config by remember { mutableStateOf(initialState.configForCurrentLevel()) }
+    var draftConfig by remember { mutableStateOf(initialState.configForCurrentLevel()) }
     var shuffleNonce by remember {
         mutableIntStateOf(
-            if (savedConfig.mode == SeparationPracticeMode.Random) {
+            if (initialState.configForCurrentLevel().mode == SeparationPracticeMode.Random) {
                 kotlin.random.Random.Default.nextInt()
             } else {
                 0
@@ -120,7 +123,13 @@ fun SeparationPracticeScreen(
     }
 
     val items by remember {
-        derivedStateOf { SeparationGenerator.generate(config, shuffleNonce = shuffleNonce) }
+        derivedStateOf {
+            SeparationGenerator.generate(
+                config = config,
+                level = separationState.selectedLevel,
+                shuffleNonce = shuffleNonce,
+            )
+        }
     }
 
     val staffZoomScale by StaffZoomStore.staffZoomScale.collectAsState()
@@ -136,22 +145,6 @@ fun SeparationPracticeScreen(
 
     val columnState = rememberLazyListState()
     val rowState = rememberLazyListState()
-
-    LaunchedEffect(items, staffZoomScale) {
-        val scalePercent =
-            (staffZoomScale.coerceIn(0.5f, 2.0f) * 100f).roundToInt().coerceIn(50, 200)
-        prefetchStaffPreviewSvgCache(
-            paths = items.map { it.musicXmlPath },
-            scalePercent = scalePercent,
-        )
-    }
-
-    LaunchedEffect(highlightIndex, items.size) {
-        if (highlightIndex >= 0 && highlightIndex < items.size) {
-            val targetState = if (isWideLayout) rowState else columnState
-            targetState.animateScrollToItem(highlightIndex)
-        }
-    }
 
     fun resetPlayback() {
         ScorePlaybackController.stop()
@@ -177,13 +170,55 @@ fun SeparationPracticeScreen(
         )
     }
 
+    fun switchLevel(newLevel: SeparationPracticeLevel) {
+        if (newLevel == separationState.selectedLevel) return
+        resetPlayback()
+        val withCurrentSaved =
+            when (separationState.selectedLevel) {
+                SeparationPracticeLevel.Basic -> separationState.copy(basicConfig = config)
+                SeparationPracticeLevel.Advanced -> separationState.copy(advancedConfig = config)
+            }
+        val nextState = withCurrentSaved.copy(selectedLevel = newLevel)
+        val nextConfig = nextState.configForCurrentLevel()
+        separationState = nextState
+        config = nextConfig
+        draftConfig = nextConfig
+        AppSettings.setSeparationPracticeState(nextState)
+        if (nextConfig.mode == SeparationPracticeMode.Random) shuffleNonce++
+        scope.launch {
+            val targetState = if (isWideLayout) rowState else columnState
+            targetState.animateScrollToItem(0)
+        }
+    }
+
+    LaunchedEffect(items, staffZoomScale) {
+        val scalePercent =
+            (staffZoomScale.coerceIn(0.5f, 2.0f) * 100f).roundToInt().coerceIn(50, 200)
+        prefetchStaffPreviewSvgCache(
+            paths = items.map { it.musicXmlPath },
+            scalePercent = scalePercent,
+        )
+    }
+
+    LaunchedEffect(highlightIndex, items.size) {
+        if (highlightIndex >= 0 && highlightIndex < items.size) {
+            val targetState = if (isWideLayout) rowState else columnState
+            targetState.animateScrollToItem(highlightIndex)
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             resetPlayback()
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    val rhythmLabel =
+        when (separationState.selectedLevel) {
+            SeparationPracticeLevel.Basic -> "八分音符点位"
+            SeparationPracticeLevel.Advanced -> "十六分音符点位"
+        }
+
     CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Rtl) {
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -199,12 +234,18 @@ fun SeparationPracticeScreen(
                     ) {
                         SeparationPracticeSettingsContent(
                             config = draftConfig,
+                            practiceLevel = separationState.selectedLevel,
                             onConfigChange = { draftConfig = it },
                             onClose = { scope.launch { drawerState.close() } },
                             onConfirm = {
                                 resetPlayback()
                                 config = draftConfig
-                                AppSettings.setSeparationConfig(config)
+                                separationState =
+                                    when (separationState.selectedLevel) {
+                                        SeparationPracticeLevel.Basic -> separationState.copy(basicConfig = config)
+                                        SeparationPracticeLevel.Advanced -> separationState.copy(advancedConfig = config)
+                                    }
+                                AppSettings.setSeparationPracticeState(separationState)
                                 if (config.mode == SeparationPracticeMode.Random) shuffleNonce++
                                 scope.launch {
                                     drawerState.close()
@@ -223,7 +264,28 @@ fun SeparationPracticeScreen(
                     modifier = modifier,
                     topBar = {
                         TopAppBar(
-                            title = { Text("手脚分家练习") },
+                            title = {
+                                TabRow(
+                                    selectedTabIndex =
+                                        if (separationState.selectedLevel == SeparationPracticeLevel.Basic) {
+                                            0
+                                        } else {
+                                            1
+                                        },
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    Tab(
+                                        selected = separationState.selectedLevel == SeparationPracticeLevel.Basic,
+                                        onClick = { switchLevel(SeparationPracticeLevel.Basic) },
+                                        text = { Text(SeparationPracticeLevel.Basic.label) },
+                                    )
+                                    Tab(
+                                        selected = separationState.selectedLevel == SeparationPracticeLevel.Advanced,
+                                        onClick = { switchLevel(SeparationPracticeLevel.Advanced) },
+                                        text = { Text(SeparationPracticeLevel.Advanced.label) },
+                                    )
+                                }
+                            },
                             navigationIcon = {
                                 IconButton(
                                     onClick = onBack,
@@ -323,6 +385,7 @@ fun SeparationPracticeScreen(
                                 listLoopCount = config.listLoopCount,
                                 cardLoopCount = config.cardLoopCount,
                                 modeLabel = config.mode.label,
+                                rhythmLabel = rhythmLabel,
                                 modifier = Modifier.fillMaxWidth(),
                             )
 

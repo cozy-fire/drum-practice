@@ -7,7 +7,7 @@ local.properties
 captures/
 *.iml
 .idea/
-
+keystore.properties
 # Kotlin
 .kotlin/
 
@@ -22,3 +22,4 @@ Thumbs.db
 debug-*.log
 /composeApp/.cxx/
 /.cursor/
+/composeApp/release/

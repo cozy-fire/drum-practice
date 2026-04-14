@@ -34,6 +34,7 @@ sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.re
 sqldelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 
+jetbrains-compose-components-animatedimage = { module = "org.jetbrains.compose.components:components-animatedimage", version.ref = "compose" }
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

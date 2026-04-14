@@ -1,6 +1,0 @@
----
-description: 
-alwaysApply: true
----
-
-每次debug，我都是用真机调试，并且包名是com.drumpractise.app，按照这个生成提示

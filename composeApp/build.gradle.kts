@@ -1,6 +1,8 @@
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Exec
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -53,6 +55,7 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.components.resources)
+            implementation(libs.jetbrains.compose.components.animatedimage)
             implementation(libs.bundles.kmp.common)
             implementation(libs.androidx.navigation.compose)
         }
@@ -73,9 +76,28 @@ kotlin {
     }
 }
 
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+val keystoreProperties = Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+
 android {
     namespace = "com.drumpractise.app"
     compileSdk = 35
+
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
 
     defaultConfig {
         applicationId = "com.drumpractise.app"
@@ -115,6 +137,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -126,6 +149,8 @@ android {
     sourceSets.named("main").configure {
         java.srcDir("src/androidMain/java")
     }
+
+
 }
 
 val verovioDataSource = rootProject.layout.projectDirectory.dir("external/verovio/data")

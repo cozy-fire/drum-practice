@@ -21,6 +21,7 @@ fun SeparationPracticeInfo(
     listLoopCount: Int,
     cardLoopCount: Int,
     modeLabel: String,
+    rhythmLabel: String,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(
@@ -28,6 +29,7 @@ fun SeparationPracticeInfo(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+        InfoPill(text = rhythmLabel)
         InfoPill(text = "$bpm BPM")
         InfoPill(text = modeLabel)
         InfoPill(text = "列表循环 $listLoopCount 次")

@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.separationpractice.model.SeparationConfig
+import com.drumpractise.app.separationpractice.model.SeparationPracticeLevel
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 import com.drumpractise.app.separationpractice.util.separationExampleImagesForTier
 import org.jetbrains.compose.resources.painterResource
@@ -52,6 +53,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun SeparationPracticeSettingsContent(
     config: SeparationConfig,
+    practiceLevel: SeparationPracticeLevel,
     onConfigChange: (SeparationConfig) -> Unit,
     onClose: () -> Unit,
     onConfirm: () -> Unit,
@@ -87,6 +89,7 @@ fun SeparationPracticeSettingsContent(
                     val checked = config.points.contains(idx)
                     SelectRow(
                         tier = idx,
+                        practiceLevel = practiceLevel,
                         checked = checked,
                         onToggle = {
                             val next = if (checked) config.points - idx else config.points + idx
@@ -152,13 +155,14 @@ private fun SectionTitle(text: String) {
 @Composable
 private fun SelectRow(
     tier: Int,
+    practiceLevel: SeparationPracticeLevel,
     checked: Boolean,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(14.dp)
     val exampleScroll = rememberScrollState()
-    val exampleImages = remember(tier) { separationExampleImagesForTier(tier) }
+    val exampleImages = remember(tier, practiceLevel) { separationExampleImagesForTier(tier, practiceLevel) }
     Column(
         modifier =
             modifier

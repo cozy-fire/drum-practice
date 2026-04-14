@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <identification>
+    <encoding>
+      <software>MuseScore 4.0</software>
+      <encoding-date>2026-04-13</encoding-date>
+      <supports element="beam" type="yes"/>
+      <supports element="stem" type="yes"/>
+    </encoding>
+  </identification>
+  <defaults>
+    <scaling>
+      <millimeters>6.99911</millimeters>
+      <tenths>40</tenths>
+    </scaling>
+    <music-font font-family="Leland"/>
+    <word-font font-family="Edwin" font-size="10"/>
+  </defaults>
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">Drum Set</part-name>
+
+      <score-instrument id="P1-I36">
+        <instrument-name>Kick Drum</instrument-name>
+      </score-instrument>
+      <score-instrument id="P1-I38">
+        <instrument-name>Snare Drum</instrument-name>
+      </score-instrument>
+      <score-instrument id="P1-I42">
+        <instrument-name>Hi-Hat Closed</instrument-name>
+      </score-instrument>
+
+      <midi-instrument id="P1-I36">
+        <midi-channel>10</midi-channel>
+        <midi-program>1</midi-program>
+        <midi-unpitched>36</midi-unpitched>
+        <volume>80</volume>
+      </midi-instrument>
+      <midi-instrument id="P1-I38">
+        <midi-channel>10</midi-channel>
+        <midi-program>1</midi-program>
+        <midi-unpitched>38</midi-unpitched>
+        <volume>80</volume>
+      </midi-instrument>
+      <midi-instrument id="P1-I42">
+        <midi-channel>10</midi-channel>
+        <midi-program>1</midi-program>
+        <midi-unpitched>42</midi-unpitched>
+        <volume>75</volume>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1" width="300">
+      <attributes>
+        <divisions>4</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>2</beats><beat-type>4</beat-type></time>
+        <staves>1</staves>
+        <clef><sign>percussion</sign><line>2</line></clef>
+      </attributes>
+
+      <!-- BD（点位 {4} -> step 4） -->
+      <forward><duration>3</duration></forward>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>1</duration>
+        <instrument id="P1-I36"/>
+        <voice>3</voice>
+        <type>16th</type>
+        <stem>down</stem>
+      </note>
+      <forward><duration>4</duration></forward>
+
+      <backup><duration>8</duration></backup>
+
+      <!-- SD（点位 {4} -> step 8） -->
+      <forward><duration>7</duration></forward>
+      <note>
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>1</duration>
+        <instrument id="P1-I38"/>
+        <voice>2</voice>
+        <type>16th</type>
+        <stem>down</stem>
+      </note>
+
+      <backup><duration>8</duration></backup>
+
+      <!-- HH：4 个八分音符铺满 2/4 小节 -->
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42"/>
+        <voice>1</voice>
+        <type>eighth</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+        <beam number="1">begin</beam>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42"/>
+        <voice>1</voice>
+        <type>eighth</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+        <beam number="1">end</beam>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42"/>
+        <voice>1</voice>
+        <type>eighth</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+        <beam number="1">begin</beam>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>2</duration>
+        <instrument id="P1-I42"/>
+        <voice>1</voice>
+        <type>eighth</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+        <beam number="1">end</beam>
+      </note>
+
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>
+

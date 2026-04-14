@@ -58,9 +58,6 @@ actual class MetronomeEngine actual constructor() {
                         .Builder()
                         .setUsage(AudioAttributes.USAGE_GAME)
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    applyLowLatencyAudioFlag(attrBuilder)
-                }
                 val attrs = attrBuilder.build()
                 val audioFormat =
                     AudioFormat
@@ -257,11 +254,6 @@ actual class MetronomeEngine actual constructor() {
 
         /** ~5.3ms @ 48k；再小容易 write 过频，收益有限。 */
         private const val MAX_CHUNK_SAMPLES = 256
-
-        @Suppress("DEPRECATION")
-        private fun applyLowLatencyAudioFlag(builder: AudioAttributes.Builder) {
-            builder.setFlags(AudioAttributes.FLAG_LOW_LATENCY)
-        }
 
         private fun rawResId(
             preset: MetronomeSoundPreset,
