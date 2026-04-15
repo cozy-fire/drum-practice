@@ -33,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -64,6 +65,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.drumpractise.app.constance.MetronomeConst
+import com.drumpractise.app.platform.PostNotificationsPermissionEffect
+import com.drumpractise.app.settings.AppSettings
 import com.drumpractise.app.theme.DrumAccentBeat
 import drumhero.composeapp.generated.resources.Res
 import drumhero.composeapp.generated.resources.metronome_note_four_sixteenth_selected
@@ -88,6 +91,8 @@ fun MetronomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val engine = LocalMetronomeEngine.current
+    var backgroundEnabled by remember { mutableStateOf(AppSettings.getMetronomeBackgroundPlayEnabled()) }
+    PostNotificationsPermissionEffect(request = backgroundEnabled)
 
     var bpm by remember { mutableIntStateOf(110) }
     /** 圆环拖动时的预览值；null 表示未在拖动预览，界面显示已提交 [bpm]。 */
@@ -99,13 +104,19 @@ fun MetronomeScreen(
         onDispose {
             commitJob?.cancel()
             commitJob = null
-            engine.stop()
+            if (!backgroundEnabled) {
+                engine.stop()
+            }
         }
     }
 
     var noteDivisor by remember { mutableIntStateOf(1) }
     var preset by remember { mutableStateOf(MetronomeSoundPreset.Tr707) }
-    var playing by remember { mutableStateOf(false) }
+    var playing by remember {
+        mutableStateOf(
+            if (backgroundEnabled) AppSettings.getMetronomeBackgroundRunning() else false,
+        )
+    }
     var currentIndexInPeriod by remember { mutableIntStateOf(0) }
 
     val onBeat: (Int, MetronomeAccent) -> Unit = remember {
@@ -117,9 +128,33 @@ fun MetronomeScreen(
     }
 
     LaunchedEffect(playing, bpm, noteDivisor, preset) {
-        engine.stop()
-        if (!playing) return@LaunchedEffect
-        engine.start(MetronomeRunConfig(bpm, noteDivisor, preset), onBeat)
+        val cfg = MetronomeRunConfig(bpm, noteDivisor, preset)
+        if (backgroundEnabled) {
+            engine.stop()
+            if (!playing) {
+                MetronomeBackgroundController.stop()
+                AppSettings.setMetronomeBackgroundRunning(false)
+                return@LaunchedEffect
+            }
+            MetronomeBackgroundController.start(cfg)
+            AppSettings.setMetronomeBackgroundRunning(true)
+        } else {
+            engine.stop()
+            if (!playing) return@LaunchedEffect
+            engine.start(cfg, onBeat)
+        }
+    }
+
+    LaunchedEffect(backgroundEnabled, playing, bpm, noteDivisor) {
+        if (!backgroundEnabled || !playing) return@LaunchedEffect
+        val intervalMs = (metronomeIntervalNs(bpm, noteDivisor) / 1_000_000L).coerceAtLeast(1L)
+        val period = metronomeBeatPeriod(noteDivisor)
+        var idx = currentIndexInPeriod
+        while (playing) {
+            delay(intervalMs)
+            idx = (idx + 1) % period
+            currentIndexInPeriod = idx
+        }
     }
 
     var bpmDialogOpen by remember { mutableStateOf(false) }
@@ -149,6 +184,30 @@ fun MetronomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    "后台播放",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Switch(
+                    checked = backgroundEnabled,
+                    onCheckedChange = { enabled ->
+                        backgroundEnabled = enabled
+                        AppSettings.setMetronomeBackgroundPlayEnabled(enabled)
+                        if (!enabled) {
+                            MetronomeBackgroundController.stop()
+                            AppSettings.setMetronomeBackgroundRunning(false)
+                            playing = false
+                            engine.stop()
+                        }
+                    },
+                )
+            }
             BpmDial(
                 displayBpm = dialPreviewBpm ?: bpm,
                 onDialPreviewChange = { dialPreviewBpm = it.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) },

@@ -22,4 +22,5 @@ Thumbs.db
 debug-*.log
 /composeApp/.cxx/
 /.cursor/
+/.opencode/
 /composeApp/release/

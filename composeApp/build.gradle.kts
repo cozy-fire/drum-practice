@@ -47,6 +47,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.koin.android)
             implementation(libs.sqldelight.android)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.gif)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
