@@ -50,6 +50,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,19 +64,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.drumpractise.app.accentshift.components.AccentShiftHandImageSlot
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeCard
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeInfo
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeSettingsContent
+import com.drumpractise.app.accentshift.components.HandImageDisplayMode
 import com.drumpractise.app.constance.VerovioConfig
 import com.drumpractise.app.score.StaffZoomStore
 import com.drumpractise.app.score.components.StaffZoomAdjustBar
 import com.drumpractise.app.score.prefetchStaffPreviewSvgCache
 import com.drumpractise.app.accentshift.generator.AccentShiftGenerator
+import com.drumpractise.app.accentshift.handmotion.AccentShiftHandMotionPlanner
+import com.drumpractise.app.accentshift.handmotion.HandMotionTimeline
+import com.drumpractise.app.score.musicxml.MusicXmlRepository
 import com.drumpractise.app.score.MusicXmlQueueItem
 import com.drumpractise.app.score.ScorePlaybackController
 import com.drumpractise.app.score.ScorePlaybackUiState
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 import com.drumpractise.app.settings.AppSettings
+import drumhero.composeapp.generated.resources.Res
+import drumhero.composeapp.generated.resources.accent_shift_hand_static
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
@@ -132,6 +140,18 @@ fun AccentShiftPracticeScreen(
 
     LaunchedEffect(trackItems.size) {
         selectedTrackIndex = selectedTrackIndex.coerceIn(0, (trackItems.size - 1).coerceAtLeast(0))
+    }
+
+    // 手型 GIF 时间轴（后续与 HandImageDisplayMode / 播放进度对齐）
+    var handMotionTimeline by remember { mutableStateOf(HandMotionTimeline(emptyList())) }
+    LaunchedEffect(trackItems, config.bpm, config.cardLoopCount) {
+        handMotionTimeline =
+            AccentShiftHandMotionPlanner.buildHandMotionTimelineForQueue(
+                items = trackItems,
+                bpm = config.bpm,
+                cardLoopCount = config.cardLoopCount,
+                loadXml = { path -> MusicXmlRepository.getXml(path) },
+            )
     }
 
     val playbackUi by ScorePlaybackController.uiState.collectAsState()
@@ -218,6 +238,12 @@ fun AccentShiftPracticeScreen(
                     .padding(horizontal = 16.dp),
         ) {
             Spacer(Modifier.height(12.dp))
+            InstructionRow(
+                handMotionTimeline = handMotionTimeline,
+                leftHandMode = HandImageDisplayMode.Static(Res.drawable.accent_shift_hand_static),
+                rightHandMode = HandImageDisplayMode.Static(Res.drawable.accent_shift_hand_static),
+            )
+            Spacer(Modifier.height(10.dp))
             AccentShiftPracticeInfo(
                 bpm = config.bpm,
                 listLoopCount = config.listLoopCount,
@@ -457,3 +483,37 @@ fun AccentShiftPracticeScreen(
     }
 }
 
+@Composable
+private fun InstructionRow(
+    handMotionTimeline: HandMotionTimeline,
+    leftHandMode: HandImageDisplayMode,
+    rightHandMode: HandImageDisplayMode,
+) {
+    key(handMotionTimeline.totalDurationMs, handMotionTimeline.segments.size) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(250.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            AccentShiftHandImageSlot(
+                mode = leftHandMode,
+                accessibilityDescription = "左手手型",
+                modifier =
+                    Modifier
+                        .weight(1F)
+                        .fillMaxHeight(),
+            )
+            AccentShiftHandImageSlot(
+                mode = rightHandMode,
+                accessibilityDescription = "右手手型",
+                modifier =
+                    Modifier
+                        .weight(1F)
+                        .fillMaxHeight(),
+            )
+        }
+    }
+}

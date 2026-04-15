@@ -32,9 +32,6 @@ object AppSettings {
     private const val KEY_ACCENT_SHIFT_BPM = "accent_shift_bpm"
     private const val KEY_ACCENT_SHIFT_MODE = "accent_shift_mode"
 
-    private const val KEY_METRONOME_BACKGROUND_PLAY = "metronome_background_play"
-    private const val KEY_METRONOME_BACKGROUND_RUNNING = "metronome_background_running"
-
     private val settings: Settings = Settings()
 
     private val separationJson =
@@ -53,20 +50,6 @@ object AppSettings {
 
     fun setStaffZoomConfigured(configured: Boolean) {
         settings.putBoolean(KEY_STAFF_ZOOM_CONFIGURED, configured)
-    }
-
-    fun getMetronomeBackgroundPlayEnabled(): Boolean =
-        settings.getBoolean(KEY_METRONOME_BACKGROUND_PLAY, defaultValue = false)
-
-    fun setMetronomeBackgroundPlayEnabled(enabled: Boolean) {
-        settings.putBoolean(KEY_METRONOME_BACKGROUND_PLAY, enabled)
-    }
-
-    fun getMetronomeBackgroundRunning(): Boolean =
-        settings.getBoolean(KEY_METRONOME_BACKGROUND_RUNNING, defaultValue = false)
-
-    fun setMetronomeBackgroundRunning(running: Boolean) {
-        settings.putBoolean(KEY_METRONOME_BACKGROUND_RUNNING, running)
     }
 
     fun getSeparationPracticeState(): SeparationPracticeState {
