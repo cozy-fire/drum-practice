@@ -83,7 +83,7 @@ import com.drumpractise.app.score.ScorePlaybackUiState
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 import com.drumpractise.app.settings.AppSettings
 import drumhero.composeapp.generated.resources.Res
-import drumhero.composeapp.generated.resources.accent_shift_hand_static
+import drumhero.composeapp.generated.resources.accent_static_left_up
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
@@ -237,12 +237,15 @@ fun AccentShiftPracticeScreen(
                     .padding(innerPadding)
                     .padding(horizontal = 16.dp),
         ) {
-            Spacer(Modifier.height(12.dp))
-            InstructionRow(
-                handMotionTimeline = handMotionTimeline,
-                leftHandMode = HandImageDisplayMode.Static(Res.drawable.accent_shift_hand_static),
-                rightHandMode = HandImageDisplayMode.Static(Res.drawable.accent_shift_hand_static),
-            )
+            // 手型区域展示暂不实现
+            if (false) {
+                Spacer(Modifier.height(12.dp))
+                InstructionRow(
+                    handMotionTimeline = handMotionTimeline,
+                    leftHandMode = HandImageDisplayMode.Static(Res.drawable.accent_static_left_up),
+                    rightHandMode = HandImageDisplayMode.Static(Res.drawable.accent_static_left_up),
+                )
+            }
             Spacer(Modifier.height(10.dp))
             AccentShiftPracticeInfo(
                 bpm = config.bpm,
