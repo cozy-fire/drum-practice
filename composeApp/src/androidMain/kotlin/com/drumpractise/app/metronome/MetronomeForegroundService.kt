@@ -60,7 +60,9 @@ class MetronomeForegroundService : Service() {
         if (running) return
         running = true
         AppSettings.setMetronomeBackgroundRunning(true)
-        engine.start(config) { _, _ -> }
+        engine.start(config) { index, tier ->
+            MetronomeBackgroundController.emitBeat(index, tier)
+        }
     }
 
     private fun stopEngine() {

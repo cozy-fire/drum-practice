@@ -31,7 +31,7 @@ actual object MetronomeBackgroundController {
         engine.updateConfig(config)
     }
 
-    fun setOnBeatListener(onBeat: ((Int, MetronomeAccent) -> Unit)?) {
+    actual fun setOnBeatListener(onBeat: ((Int, MetronomeAccent) -> Unit)?) {
         storedOnBeat = onBeat
     }
 }

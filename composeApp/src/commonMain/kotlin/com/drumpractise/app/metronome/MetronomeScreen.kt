@@ -9,9 +9,11 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,24 +24,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -65,11 +63,12 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.drumpractise.app.constance.MetronomeConst
+import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.platform.PostNotificationsPermissionEffect
+import com.drumpractise.app.score.components.BpmEditDialog
 import com.drumpractise.app.settings.AppSettings
 import com.drumpractise.app.theme.DrumAccentBeat
 import drumhero.composeapp.generated.resources.Res
@@ -85,8 +84,6 @@ import kotlin.math.atan2
 import kotlin.math.roundToInt
 
 private const val BPM_DIAL_COMMIT_DEBOUNCE_MS = 500L
-
-private fun bpmTitle(): String = "BPM (${MetronomeConst.BPM_MIN}–${MetronomeConst.BPM_MAX})"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -154,21 +151,20 @@ fun MetronomeScreen(
         }
     }
 
-    LaunchedEffect(metronomeBackgroundEnabled, playing, bpm, noteDivisor) {
-        if (!metronomeBackgroundEnabled || !playing) return@LaunchedEffect
-        // 后台播放时 Service 不回调 UI 的 onBeat，这里用 ticker 保持 UI 节拍点更新（不发声）。
-        val period = metronomeBeatPeriod(noteDivisor)
-        val intervalMs = (60_000.0 / bpm.coerceAtLeast(1) / noteDivisor.coerceAtLeast(1)).toLong().coerceAtLeast(1L)
-        var idx = 0
-        while (true) {
-            currentIndexInPeriod = idx
-            idx = (idx + 1) % period
-            delay(intervalMs)
+    DisposableEffect(metronomeBackgroundEnabled, playing) {
+        if (metronomeBackgroundEnabled && playing) {
+            MetronomeBackgroundController.setOnBeatListener(onBeat)
+        } else {
+            MetronomeBackgroundController.setOnBeatListener(null)
+        }
+        onDispose {
+            MetronomeBackgroundController.setOnBeatListener(null)
         }
     }
 
     var bpmDialogOpen by remember { mutableStateOf(false) }
     var bpmDraft by remember { mutableStateOf("") }
+    val isTabletWidth = LocalWindowLayoutInfo.current.isTabletWidth
 
     Scaffold(
         modifier = modifier,
@@ -188,12 +184,14 @@ fun MetronomeScreen(
             )
         },
     ) { innerPadding ->
-        Spacer(Modifier.height(8.dp))
-        Column(
-            modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
+        val baseContentModifier =
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 20.dp, vertical = 8.dp)
+
+        @Composable
+        fun LeftColumnContent() {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start,
@@ -253,7 +251,7 @@ fun MetronomeScreen(
                     commitJob?.cancel()
                     commitJob = null
                     dialPreviewBpm = null
-                    bpmDraft = bpm.toString()
+                    bpmDraft = ""
                     bpmDialogOpen = true
                 },
                 modifier = Modifier.size(260.dp),
@@ -317,6 +315,10 @@ fun MetronomeScreen(
                     }
                 }
             }
+        }
+
+        @Composable
+        fun ColumnScope.RightColumnContent(playButtonModifier: Modifier = Modifier) {
             Text("音色", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             val chipScroll = rememberScrollState()
             Row(
@@ -338,45 +340,58 @@ fun MetronomeScreen(
             PlayStopButton(
                 playing = playing,
                 onToggle = { playing = !playing },
-                modifier = Modifier.padding(bottom = 24.dp),
+                modifier = playButtonModifier.padding(bottom = 24.dp),
             )
+        }
+
+        if (isTabletWidth) {
+            Row(
+                modifier = baseContentModifier,
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                verticalAlignment = Alignment.Top,
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    LeftColumnContent()
+                }
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    RightColumnContent(playButtonModifier = Modifier)
+                }
+            }
+        } else {
+            Column(
+                modifier = baseContentModifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                LeftColumnContent()
+                RightColumnContent(playButtonModifier = Modifier)
+            }
         }
     }
 
-    if (bpmDialogOpen) {
-        AlertDialog(
-            onDismissRequest = { bpmDialogOpen = false },
-            title = { Text(bpmTitle()) },
-            text = {
-                OutlinedTextField(
-                    value = bpmDraft,
-                    onValueChange = { bpmDraft = it.filter { ch -> ch.isDigit() }.take(3) },
-                    singleLine = true,
-                    label = { Text("BPM") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        commitJob?.cancel()
-                        commitJob = null
-                        val v = bpmDraft.toIntOrNull()?.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) ?: bpm
-                        bpm = v
-                        dialPreviewBpm = null
-                        bpmDialogOpen = false
-                    },
-                ) {
-                    Text("确定")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { bpmDialogOpen = false }) {
-                    Text("取消")
-                }
-            },
-        )
-    }
+    BpmEditDialog(
+        open = bpmDialogOpen,
+        currentBpm = bpm,
+        bpmDraft = bpmDraft,
+        onBpmDraftChange = { bpmDraft = it },
+        onDismiss = { bpmDialogOpen = false },
+        onConfirm = { v ->
+            if (v != null) {
+                commitJob?.cancel()
+                commitJob = null
+                bpm = v.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+                dialPreviewBpm = null
+            }
+        },
+    )
 }
 
 @Composable

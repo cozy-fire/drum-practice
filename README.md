@@ -1,32 +1,50 @@
 # drum-practice
 
-Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：Android、Desktop（JVM）；在 **macOS** 上可额外启用 **iOS** 目标。
+Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：Android、Desktop（JVM）；IOS暂不支持。
 
-## 环境
+## 功能介绍（按工作台顺序）
 
-- JDK 17+
-- Android Studio / IntelliJ（建议安装 Kotlin Multiplatform 插件）
-- Android SDK：复制 `local.properties.example` 为 `local.properties`，设置 `sdk.dir`（或设置环境变量 `ANDROID_HOME`）
+|  | 功能说明 |
+|---|---|
+| `introduce/home_page.jpg` | 工作台预览 |
 
-## 构建
+### 1) 节拍器
 
-```bash
-# Windows
-.\gradlew.bat :composeApp:assembleDebug
+- 支持 BPM 调整、分拍（1/2/4）、强弱拍提示、音色选择
 
-# 桌面端（Compose Desktop）
-.\gradlew.bat :composeApp:run
-```
+|  | 功能说明 |
+|---|---|
+| `introduce/metronome_intro.mp4` | 节拍器包含BPM、音色、拍型调整 |
 
-Gradle 发行版已配置为 **华为云** 镜像；Maven 仓库在 `settings.gradle.kts` 中增加了 **阿里云** 镜像以加速依赖解析。
+### 2) 随机练习
 
-## 模块说明
+- 随机生成练习组合，支持 BPM / 分拍设置与练习播放
 
-- `composeApp`：`commonMain` 共享 UI 与领域逻辑；`androidMain` / `desktopMain` / `iosMain`（仅 macOS 注册 iOS 目标时参与编译）为各端实现。
-- 五线谱：**Android** 上为 **Verovio（JNI）+ WebView 仅用于展示 SVG**（`MusicXmlScoreScreen`）；桌面 / iOS 该入口为占位说明。
-- 数据：**SQLDelight**（`DrumDatabase`）；**Koin** 在 Android `Application` 中注入 `openDrumDatabase()`。
-- 节拍器：`MetronomeEngine` 为 expect/actual 占位，后续在 Android 用 `AudioTrack` 等实现。
+|  | 功能说明 |
+|---|---|
+| `introduce/random_practise_intro.mp4` | 随机练习会提供不同的节奏型 + 加花卡片，旨在锻炼基础视奏能力 |
 
-## iOS（macOS）
+### 3) 手脚分家练习
 
-在 macOS 上构建时 Gradle 会注册 `iosArm64` / `iosSimulatorArm64` 并编译 `iosMain`；需配合 Xcode 工程（可用官方 KMP 向导生成 `iosApp` 再合并）以在模拟器/真机运行。
+- 手脚分家练习通过隔离手部与腿部动作，将八分/十六分点位所有常见单词都纳入练习范围，该功能旨在锻炼手脚是否可以做到隔离控制
+
+|  | 功能说明 |
+|---|---|
+| `introduce/separation_practise_basic_intro.mp4` | 基础模式：八分音符点位练习 |
+| `introduce/separation_practise_advance_intro.mp4` | 进阶模式：十六分音符点位练习 |
+
+### 4) 重音移位练习
+
+- 锻炼Full、Down、Tap、Up击打技巧
+
+|  | 功能说明 |
+|---|---|
+| `introduce/accent_practice_intro.mp4` | 提供15个重音点位分布节奏的随机/顺序练习 |
+
+### 5) 设置页
+
+- 配置应用相关偏好与练习显示参数
+
+|  | 功能说明 |
+|---|---|
+| `introduce/settings_intro.mp4` | 设置页功能录屏 |

@@ -5,6 +5,8 @@ import android.os.Build
 import com.drumpractise.app.data.drumApplicationContext
 
 actual object MetronomeBackgroundController {
+    private var storedOnBeat: ((Int, MetronomeAccent) -> Unit)? = null
+
     actual fun start(config: MetronomeRunConfig) {
         val ctx = drumApplicationContext()
         val intent =
@@ -40,6 +42,14 @@ actual object MetronomeBackgroundController {
                 putExtra(MetronomeForegroundService.EXTRA_PRESET_ORDINAL, config.preset.ordinal)
             }
         ctx.startService(intent)
+    }
+
+    actual fun setOnBeatListener(onBeat: ((Int, MetronomeAccent) -> Unit)?) {
+        storedOnBeat = onBeat
+    }
+
+    internal fun emitBeat(indexInPeriod: Int, tier: MetronomeAccent) {
+        storedOnBeat?.invoke(indexInPeriod, tier)
     }
 }
 

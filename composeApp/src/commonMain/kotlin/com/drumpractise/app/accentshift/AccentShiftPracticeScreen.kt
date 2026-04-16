@@ -343,7 +343,7 @@ fun AccentShiftPracticeScreen(
                         drawerContentColor = Color.White,
                         drawerTonalElevation = 0.dp,
                         drawerShape = RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp),
-                        modifier = Modifier.fillMaxWidth(0.3f).fillMaxHeight(),
+                        modifier = Modifier.fillMaxWidth(if (isWideLayout) 0.3f else 0.7f).fillMaxHeight(),
                     ) {
                         AccentShiftPracticeSettingsContent(
                             config = draftConfig,

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.drumpractise.app.constance.MetronomeConst
 
 @Composable
-internal fun BpmEditDialog(
+fun BpmEditDialog(
     open: Boolean,
     currentBpm: Int,
     bpmDraft: String,

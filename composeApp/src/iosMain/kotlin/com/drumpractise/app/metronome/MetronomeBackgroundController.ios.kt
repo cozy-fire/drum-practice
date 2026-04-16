@@ -3,6 +3,7 @@ package com.drumpractise.app.metronome
 actual object MetronomeBackgroundController {
     private val engine = MetronomeEngine()
     private var running = false
+    private var storedOnBeat: ((Int, MetronomeAccent) -> Unit)? = null
 
     actual fun start(config: MetronomeRunConfig) {
         if (running) {
@@ -10,7 +11,9 @@ actual object MetronomeBackgroundController {
             return
         }
         running = true
-        engine.start(config) { _, _ -> }
+        engine.start(config) { index, tier ->
+            storedOnBeat?.invoke(index, tier)
+        }
     }
 
     actual fun stop() {
@@ -22,6 +25,10 @@ actual object MetronomeBackgroundController {
     actual fun updateConfig(config: MetronomeRunConfig) {
         if (!running) return
         engine.updateConfig(config)
+    }
+
+    actual fun setOnBeatListener(onBeat: ((Int, MetronomeAccent) -> Unit)?) {
+        storedOnBeat = onBeat
     }
 }
 

@@ -6,5 +6,7 @@ expect object MetronomeBackgroundController {
     fun stop()
 
     fun updateConfig(config: MetronomeRunConfig)
+
+    fun setOnBeatListener(onBeat: ((Int, MetronomeAccent) -> Unit)?)
 }
 

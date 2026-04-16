@@ -234,7 +234,7 @@ fun SeparationPracticeScreen(
                         drawerContentColor = Color.White,
                         drawerTonalElevation = 0.dp,
                         drawerShape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp),
-                        modifier = Modifier.fillMaxWidth(0.3f).fillMaxHeight(),
+                        modifier = Modifier.fillMaxWidth(if (isWideLayout) 0.3f else 0.7f).fillMaxHeight(),
                     ) {
                         SeparationPracticeSettingsContent(
                             config = draftConfig,
