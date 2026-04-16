@@ -1,5 +1,5 @@
 # DrumHero
-一款陪伴你走过架子鼓基础练习的App；
+一款离线架子鼓基础练习App
 Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：Android、Desktop（JVM）；IOS暂不支持。
 
 ## 功能介绍（按工作台顺序）
