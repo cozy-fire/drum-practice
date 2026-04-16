@@ -1,12 +1,13 @@
 # DrumHero
 一款离线架子鼓基础练习App
+
 Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：Android、Desktop（JVM）；IOS暂不支持。
 
 ## 功能介绍（按工作台顺序）
 
 |  | 功能说明 |
 |---|---|
-| `introduce/home_page.jpg` | 工作台预览 |
+| <img src="introduce/home_page.jpg" width="360" alt="工作台预览" /> | 工作台预览 |
 
 ### 1) 节拍器
 
@@ -14,7 +15,7 @@ Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：An
 
 |  | 功能说明 |
 |---|---|
-| `introduce/metronome_intro.mp4` | 节拍器包含BPM、音色、拍型调整 |
+| [节拍器](introduce/metronome_intro.mp4) | 节拍器包含BPM、音色、拍型调整 |
 
 ### 2) 随机练习
 
@@ -22,7 +23,7 @@ Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：An
 
 |  | 功能说明 |
 |---|---|
-| `introduce/random_practise_intro.mp4` | 随机练习会提供不同的节奏型 + 加花卡片，旨在锻炼基础视奏能力 |
+| [随机练习](introduce/random_practise_intro.mp4) | 随机练习会提供不同的节奏型 + 加花卡片，旨在锻炼基础视奏能力 |
 
 ### 3) 手脚分家练习
 
@@ -30,8 +31,8 @@ Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：An
 
 |  | 功能说明 |
 |---|---|
-| `introduce/separation_practise_basic_intro.mp4` | 基础模式：八分音符点位练习 |
-| `introduce/separation_practise_advance_intro.mp4` | 进阶模式：十六分音符点位练习 |
+| [手脚分家（基础）](introduce/separation_practise_basic_intro.mp4) | 基础模式：八分音符点位练习 |
+| [手脚分家（进阶）](introduce/separation_practise_advance_intro.mp4) | 进阶模式：十六分音符点位练习 |
 
 ### 4) 重音移位练习
 
@@ -39,7 +40,7 @@ Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：An
 
 |  | 功能说明 |
 |---|---|
-| `introduce/accent_practice_intro.mp4` | 提供15个重音点位分布节奏的随机/顺序练习 |
+| [重音移位练习](introduce/accent_practice_intro.mp4) | 提供15个重音点位分布节奏的随机/顺序练习|
 
 ### 5) 设置页
 
@@ -47,4 +48,4 @@ Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：An
 
 |  | 功能说明 |
 |---|---|
-| `introduce/settings_intro.mp4` | 设置页功能录屏 |
+| [设置页](introduce/settings_intro.mp4) | 设置页功能录屏 |
