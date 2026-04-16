@@ -3,6 +3,8 @@
 
 Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：Android、Desktop（JVM）；IOS暂不支持。
 
+下载：[Download](https://github.com/cozy-fire/drum-practice/releases/tag/v1.0.0)
+
 ## 功能介绍（按工作台顺序）
 
 |  | 功能说明 |
