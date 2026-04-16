@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Bookmark
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.drumpractise.app.constance.VerovioConfig
+import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.metronome.LocalMetronomeEngine
 import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.metronome.MetronomeRunConfig
@@ -56,7 +58,7 @@ private const val RandomFillQueueItemId = "random_fill"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicXmlScoreScreenContent(
+fun RandomPractiseScreenContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -229,14 +231,14 @@ fun MusicXmlScoreScreenContent(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.wrapContentWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 TopActionButton(
                     text = "收藏组合",
                     icon = { Icon(Icons.Outlined.Bookmark, contentDescription = null) },
                     onClick = {},
-                    modifier = Modifier.weight(1f).height(44.dp),
+                    modifier = Modifier.wrapContentWidth().height(44.dp),
                     style = TopActionButtonStyle.Gray,
                 )
                 TopActionButton(
@@ -247,7 +249,7 @@ fun MusicXmlScoreScreenContent(
                             selection = RandomPracticeComposer.composeRandom(exclude = selection)
                         }
                     },
-                    modifier = Modifier.weight(1f).height(44.dp),
+                    modifier = Modifier.wrapContentWidth().height(44.dp),
                     style = TopActionButtonStyle.GradientPurpleBlue,
                 )
             }
@@ -258,7 +260,7 @@ fun MusicXmlScoreScreenContent(
             ) {
                     item {
                         BoxWithConstraints(Modifier.fillMaxWidth()) {
-                            val wide = this.maxWidth >= 600.dp
+                            val wide = LocalWindowLayoutInfo.current.isTabletWidth
                             if (!wide) {
                                 Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                                     RhythmicPracticeCard(

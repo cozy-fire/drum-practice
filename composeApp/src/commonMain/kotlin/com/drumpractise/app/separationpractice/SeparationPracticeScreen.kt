@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -56,7 +57,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import com.drumpractise.app.constance.VerovioConfig
+import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.separationpractice.components.SeparationPracticeCard
 import com.drumpractise.app.separationpractice.components.SeparationPracticeInfo
 import com.drumpractise.app.separationpractice.components.SeparationPracticeSettingsContent
@@ -134,7 +137,8 @@ fun SeparationPracticeScreen(
 
     val staffZoomScale by StaffZoomStore.staffZoomScale.collectAsState()
 
-    var isWideLayout by remember { mutableStateOf(false) }
+    val isWideLayout = LocalWindowLayoutInfo.current.isTabletWidth
+    val maxWidth = LocalWindowLayoutInfo.current.windowWidth
 
     val highlightIndex =
         when (val s = playbackUi) {
@@ -230,7 +234,7 @@ fun SeparationPracticeScreen(
                         drawerContentColor = Color.White,
                         drawerTonalElevation = 0.dp,
                         drawerShape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp),
-                        modifier = Modifier.fillMaxWidth(0.7f).fillMaxHeight(),
+                        modifier = Modifier.fillMaxWidth(0.3f).fillMaxHeight(),
                     ) {
                         SeparationPracticeSettingsContent(
                             config = draftConfig,
@@ -256,6 +260,7 @@ fun SeparationPracticeScreen(
                             modifier = Modifier.padding(16.dp),
                         )
                     }
+
                 }
             },
         ) {
@@ -272,7 +277,7 @@ fun SeparationPracticeScreen(
                                         } else {
                                             1
                                         },
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier.width(150.dp),
                                 ) {
                                     Tab(
                                         selected = separationState.selectedLevel == SeparationPracticeLevel.Basic,
@@ -389,49 +394,43 @@ fun SeparationPracticeScreen(
                                 modifier = Modifier.fillMaxWidth(),
                             )
 
-                            BoxWithConstraints(Modifier.fillMaxSize()) {
-                                SideEffect {
-                                    isWideLayout = maxWidth >= 600.dp
+                            if (items.isEmpty()) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text(
+                                        text = "请在右上角设置中勾选练习点位",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+                                    )
                                 }
-                                val wide = this.maxWidth >= 600.dp
-                                if (items.isEmpty()) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        Text(
-                                            text = "请在右上角设置中勾选练习点位",
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+                            } else if (!isWideLayout) {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                                    state = columnState,
+                                ) {
+                                    itemsIndexed(items, key = { _, it -> it.id }) { idx, item ->
+                                        SeparationPracticeCard(
+                                            item = item,
+                                            highlighted = highlightIndex == idx,
+                                            modifier = Modifier.fillMaxWidth(),
                                         )
                                     }
-                                } else if (!wide) {
-                                    LazyColumn(
-                                        modifier = Modifier.fillMaxSize(),
-                                        verticalArrangement = Arrangement.spacedBy(14.dp),
-                                        state = columnState,
-                                    ) {
-                                        itemsIndexed(items, key = { _, it -> it.id }) { idx, item ->
-                                            SeparationPracticeCard(
-                                                item = item,
-                                                highlighted = highlightIndex == idx,
-                                                modifier = Modifier.fillMaxWidth(),
-                                            )
-                                        }
-                                    }
-                                } else {
-                                    LazyRow(
-                                        modifier = Modifier.fillMaxSize(),
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                        state = rowState,
-                                    ) {
-                                        itemsIndexed(items, key = { _, it -> it.id }) { idx, item ->
-                                            SeparationPracticeCard(
-                                                item = item,
-                                                highlighted = highlightIndex == idx,
-                                                modifier = Modifier.width(maxWidth * 0.4f).wrapContentHeight(),
-                                            )
-                                        }
+                                }
+                            } else {
+                                LazyRow(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    state = rowState,
+                                ) {
+                                    itemsIndexed(items, key = { _, it -> it.id }) { idx, item ->
+                                        SeparationPracticeCard(
+                                            item = item,
+                                            highlighted = highlightIndex == idx,
+                                            modifier = Modifier.width(maxWidth * 0.4f).wrapContentHeight(),
+                                        )
                                     }
                                 }
                             }

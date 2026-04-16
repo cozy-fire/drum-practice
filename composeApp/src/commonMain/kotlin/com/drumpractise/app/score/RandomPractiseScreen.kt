@@ -4,4 +4,4 @@ import androidx.compose.runtime.Composable
 
 /** Offline MusicXML / MEI / MXL staff notation (Verovio on Android; stub elsewhere). */
 @Composable
-expect fun MusicXmlScoreScreen(onBack: () -> Unit)
+expect fun RandomPractiseScreen(onBack: () -> Unit)

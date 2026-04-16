@@ -32,6 +32,11 @@ object AppSettings {
     private const val KEY_ACCENT_SHIFT_BPM = "accent_shift_bpm"
     private const val KEY_ACCENT_SHIFT_MODE = "accent_shift_mode"
 
+    private const val KEY_METRONOME_BACKGROUND_PLAY_ENABLED = "metronome_background_play"
+    private const val KEY_METRONOME_BACKGROUND_RUNNING = "metronome_background_running"
+
+    private const val KEY_TABLET_WIDTH_BREAKPOINT_DP = "tablet_width_breakpoint_dp"
+
     private val settings: Settings = Settings()
 
     private val separationJson =
@@ -225,5 +230,26 @@ object AppSettings {
         settings.putInt(KEY_ACCENT_SHIFT_LIST_LOOP_COUNT, c.listLoopCount)
         settings.putInt(KEY_ACCENT_SHIFT_BPM, c.bpm)
         settings.putString(KEY_ACCENT_SHIFT_MODE, c.mode.name)
+    }
+
+    fun getMetronomeBackgroundPlayEnabled(): Boolean =
+        settings.getBoolean(KEY_METRONOME_BACKGROUND_PLAY_ENABLED, defaultValue = false)
+
+    fun setMetronomeBackgroundPlayEnabled(enabled: Boolean) {
+        settings.putBoolean(KEY_METRONOME_BACKGROUND_PLAY_ENABLED, enabled)
+    }
+
+    fun getMetronomeBackgroundRunning(): Boolean =
+        settings.getBoolean(KEY_METRONOME_BACKGROUND_RUNNING, defaultValue = false)
+
+    fun setMetronomeBackgroundRunning(running: Boolean) {
+        settings.putBoolean(KEY_METRONOME_BACKGROUND_RUNNING, running)
+    }
+
+    fun getTabletWidthBreakpointDp(): Float =
+        settings.getFloatOrNull(KEY_TABLET_WIDTH_BREAKPOINT_DP) ?: 600f
+
+    fun setTabletWidthBreakpointDp(breakpointDp: Float) {
+        settings.putFloat(KEY_TABLET_WIDTH_BREAKPOINT_DP, breakpointDp)
     }
 }

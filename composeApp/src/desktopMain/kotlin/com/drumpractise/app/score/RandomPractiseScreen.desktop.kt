@@ -5,6 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-actual fun MusicXmlScoreScreen(onBack: () -> Unit) {
-    MusicXmlScoreScreenContent(onBack = onBack, modifier = Modifier.fillMaxSize())
+actual fun RandomPractiseScreen(onBack: () -> Unit) {
+    RandomPractiseScreenContent(onBack = onBack, modifier = Modifier.fillMaxSize())
 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.drumpractise.app.constance.VerovioConfig
+import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.randompractice.RandomPracticeComposer
 import com.drumpractise.app.score.StaffPreview
 import com.drumpractise.app.score.StaffZoomStore
@@ -60,6 +61,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val isTabletWidth = LocalWindowLayoutInfo.current.isTabletWidth
 
     Scaffold(
         modifier = modifier,
@@ -85,7 +87,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             Box(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(if (isTabletWidth) 0.5f else 1f)
                         .height(160.dp)
                         .background(Color(0xFFF7F7FA), RoundedCornerShape(18.dp))
                         .padding(8.dp),

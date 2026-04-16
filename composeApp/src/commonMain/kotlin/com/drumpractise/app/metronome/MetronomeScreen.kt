@@ -18,11 +18,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
@@ -33,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -64,6 +69,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.drumpractise.app.constance.MetronomeConst
+import com.drumpractise.app.platform.PostNotificationsPermissionEffect
+import com.drumpractise.app.settings.AppSettings
 import com.drumpractise.app.theme.DrumAccentBeat
 import drumhero.composeapp.generated.resources.Res
 import drumhero.composeapp.generated.resources.metronome_note_four_sixteenth_selected
@@ -88,6 +95,8 @@ fun MetronomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val engine = LocalMetronomeEngine.current
+    var metronomeBackgroundEnabled by remember { mutableStateOf(AppSettings.getMetronomeBackgroundPlayEnabled()) }
+    PostNotificationsPermissionEffect(request = metronomeBackgroundEnabled)
 
     var bpm by remember { mutableIntStateOf(110) }
     /** 圆环拖动时的预览值；null 表示未在拖动预览，界面显示已提交 [bpm]。 */
@@ -99,27 +108,63 @@ fun MetronomeScreen(
         onDispose {
             commitJob?.cancel()
             commitJob = null
-            engine.stop()
+            if (!AppSettings.getMetronomeBackgroundPlayEnabled()) {
+                engine.stop()
+            }
         }
     }
 
     var noteDivisor by remember { mutableIntStateOf(1) }
     var preset by remember { mutableStateOf(MetronomeSoundPreset.Tr707) }
-    var playing by remember { mutableStateOf(false) }
+    var playing by remember {
+        mutableStateOf(
+            if (metronomeBackgroundEnabled) AppSettings.getMetronomeBackgroundRunning() else false,
+        )
+    }
     var currentIndexInPeriod by remember { mutableIntStateOf(0) }
 
     val onBeat: (Int, MetronomeAccent) -> Unit = remember {
-        { index, _ -> currentIndexInPeriod = index }
+        { index, _ ->
+            currentIndexInPeriod = index
+        }
     }
 
     LaunchedEffect(noteDivisor) {
         currentIndexInPeriod = 0
     }
 
-    LaunchedEffect(playing, bpm, noteDivisor, preset) {
-        engine.stop()
-        if (!playing) return@LaunchedEffect
-        engine.start(MetronomeRunConfig(bpm, noteDivisor, preset), onBeat)
+    LaunchedEffect(metronomeBackgroundEnabled, playing, bpm, noteDivisor, preset) {
+        val cfg = MetronomeRunConfig(bpm, noteDivisor, preset)
+        if (metronomeBackgroundEnabled) {
+            if (!playing) {
+                MetronomeBackgroundController.stop()
+                return@LaunchedEffect
+            }
+            engine.stop()
+            if (AppSettings.getMetronomeBackgroundRunning()) {
+                MetronomeBackgroundController.updateConfig(cfg)
+            } else {
+                MetronomeBackgroundController.start(cfg)
+            }
+        } else {
+            MetronomeBackgroundController.stop()
+            engine.stop()
+            if (!playing) return@LaunchedEffect
+            engine.start(cfg, onBeat)
+        }
+    }
+
+    LaunchedEffect(metronomeBackgroundEnabled, playing, bpm, noteDivisor) {
+        if (!metronomeBackgroundEnabled || !playing) return@LaunchedEffect
+        // 后台播放时 Service 不回调 UI 的 onBeat，这里用 ticker 保持 UI 节拍点更新（不发声）。
+        val period = metronomeBeatPeriod(noteDivisor)
+        val intervalMs = (60_000.0 / bpm.coerceAtLeast(1) / noteDivisor.coerceAtLeast(1)).toLong().coerceAtLeast(1L)
+        var idx = 0
+        while (true) {
+            currentIndexInPeriod = idx
+            idx = (idx + 1) % period
+            delay(intervalMs)
+        }
     }
 
     var bpmDialogOpen by remember { mutableStateOf(false) }
@@ -143,11 +188,36 @@ fun MetronomeScreen(
             )
         },
     ) { innerPadding ->
+        Spacer(Modifier.height(8.dp))
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        "后台播放",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                Spacer(Modifier.width(10.dp))
+                Switch(
+                    checked = metronomeBackgroundEnabled,
+                    onCheckedChange = {
+                        metronomeBackgroundEnabled = it
+                        AppSettings.setMetronomeBackgroundPlayEnabled(it)
+                        if (!it) {
+                            AppSettings.setMetronomeBackgroundRunning(false)
+                        }
+                    },
+                )
+            }
             Spacer(Modifier.height(8.dp))
             BpmDial(
                 displayBpm = dialPreviewBpm ?: bpm,
@@ -167,6 +237,18 @@ fun MetronomeScreen(
                             commitJob = null
                         }
                 },
+                onBpmMinus = {
+                    commitJob?.cancel()
+                    commitJob = null
+                    dialPreviewBpm = null
+                    bpm = (bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+                },
+                onBpmPlus = {
+                    commitJob?.cancel()
+                    commitJob = null
+                    dialPreviewBpm = null
+                    bpm = (bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+                },
                 onBpmClick = {
                     commitJob?.cancel()
                     commitJob = null
@@ -178,7 +260,7 @@ fun MetronomeScreen(
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 NoteChoice(
@@ -186,11 +268,13 @@ fun MetronomeScreen(
                     selected = noteDivisor == 1,
                     onClick = { noteDivisor = 1 },
                 )
+                Spacer(Modifier.width(15.dp))
                 NoteChoice(
                     noteDivisor = 2,
                     selected = noteDivisor == 2,
                     onClick = { noteDivisor = 2 },
                 )
+                Spacer(Modifier.width(15.dp))
                 NoteChoice(
                     noteDivisor = 4,
                     selected = noteDivisor == 4,
@@ -355,6 +439,8 @@ private fun BpmDial(
     onDialPreviewChange: (Int) -> Unit,
     onRingDragStart: () -> Unit,
     onRingDragEnd: () -> Unit,
+    onBpmMinus: () -> Unit,
+    onBpmPlus: () -> Unit,
     onBpmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -411,19 +497,45 @@ private fun BpmDial(
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier =
-                Modifier
-                    .clip(CircleShape)
-                    .clickable(onClick = onBpmClick)
-                    .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.padding(10.dp),
         ) {
-            Text(
-                displayBpm.toString(),
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold,
-                color = primary,
-            )
-            Text("BPM", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            IconButton(
+                onClick = onBpmPlus,
+                modifier = Modifier.size(36.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowUp,
+                    contentDescription = "+1 BPM",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier =
+                    Modifier
+                        .clip(CircleShape)
+                        .clickable(onClick = onBpmClick)
+                        .padding(horizontal = 18.dp, vertical = 8.dp),
+            ) {
+                Text(
+                    displayBpm.toString(),
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = primary,
+                )
+                Text("BPM", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            IconButton(
+                onClick = onBpmMinus,
+                modifier = Modifier.size(36.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "-1 BPM",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

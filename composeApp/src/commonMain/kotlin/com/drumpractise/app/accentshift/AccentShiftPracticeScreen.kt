@@ -64,6 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.accentshift.components.AccentShiftHandImageSlot
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeCard
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeInfo
@@ -166,7 +167,8 @@ fun AccentShiftPracticeScreen(
 
     val staffZoomScale by StaffZoomStore.staffZoomScale.collectAsState()
 
-    var isWideLayout by remember { mutableStateOf(false) }
+    val isWideLayout = LocalWindowLayoutInfo.current.isTabletWidth
+    val maxWidth = LocalWindowLayoutInfo.current.windowWidth
 
     val columnState = rememberLazyListState()
     val rowState = rememberLazyListState()
@@ -255,86 +257,75 @@ fun AccentShiftPracticeScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(10.dp))
-            BoxWithConstraints(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-            ) {
-                SideEffect {
-                    isWideLayout = this.maxWidth >= 600.dp
+            if (!hasTracks) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "请在右上角设置中勾选练习档位",
+                        color = AccentShiftPracticeColors.textMuted,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                    )
                 }
-                val wide = this.maxWidth >= 600.dp
-                if (!hasTracks) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = "请在右上角设置中勾选练习档位",
-                            color = AccentShiftPracticeColors.textMuted,
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center,
+            } else if (!isWideLayout) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    state = columnState,
+                ) {
+                    itemsIndexed(items = trackItems, key = { _, it -> it.id }) { idx, track ->
+                        val cardHighlighted =
+                            (playbackLineIndex >= 0 && idx == playbackLineIndex) ||
+                                    (playbackLineIndex < 0 && idx == selectedTrackIndex)
+                        val staffPlaybackHighlight = playing && playbackLineIndex == idx
+                        AccentShiftPracticeCard(
+                            item = track,
+                            cardHighlighted = cardHighlighted,
+                            staffPlaybackHighlight = staffPlaybackHighlight,
+                            onClick = {
+                                selectedTrackIndex = idx
+                                if (playing) {
+                                    resetPlayback()
+                                    startPlayback()
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            staffPreviewHeight = 100.dp,
+                            contentPadding = 12.dp,
                         )
                     }
-                } else if (!wide) {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        state = columnState,
-                    ) {
-                        itemsIndexed(items = trackItems, key = { _, it -> it.id }) { idx, track ->
-                            val cardHighlighted =
-                                (playbackLineIndex >= 0 && idx == playbackLineIndex) ||
+                }
+            } else {
+                LazyRow(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    state = rowState,
+                ) {
+                    itemsIndexed(items = trackItems, key = { _, it -> it.id }) { idx, track ->
+                        val cardHighlighted =
+                            (playbackLineIndex >= 0 && idx == playbackLineIndex) ||
                                     (playbackLineIndex < 0 && idx == selectedTrackIndex)
-                            val staffPlaybackHighlight = playing && playbackLineIndex == idx
-                            AccentShiftPracticeCard(
-                                item = track,
-                                cardHighlighted = cardHighlighted,
-                                staffPlaybackHighlight = staffPlaybackHighlight,
-                                onClick = {
-                                    selectedTrackIndex = idx
-                                    if (playing) {
-                                        resetPlayback()
-                                        startPlayback()
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                staffPreviewHeight = 100.dp,
-                                contentPadding = 12.dp,
-                            )
-                        }
-                    }
-                } else {
-                    LazyRow(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        state = rowState,
-                    ) {
-                        itemsIndexed(items = trackItems, key = { _, it -> it.id }) { idx, track ->
-                            val cardHighlighted =
-                                (playbackLineIndex >= 0 && idx == playbackLineIndex) ||
-                                    (playbackLineIndex < 0 && idx == selectedTrackIndex)
-                            val staffPlaybackHighlight = playing && playbackLineIndex == idx
-                            AccentShiftPracticeCard(
-                                item = track,
-                                cardHighlighted = cardHighlighted,
-                                staffPlaybackHighlight = staffPlaybackHighlight,
-                                onClick = {
-                                    selectedTrackIndex = idx
-                                    if (playing) {
-                                        resetPlayback()
-                                        startPlayback()
-                                    }
-                                },
-                                modifier =
-                                    Modifier
-                                        .width(maxWidth * 0.4f)
-                                        .wrapContentHeight(),
-                                staffPreviewHeight = 128.dp,
-                                contentPadding = 18.dp,
-                            )
-                        }
+                        val staffPlaybackHighlight = playing && playbackLineIndex == idx
+                        AccentShiftPracticeCard(
+                            item = track,
+                            cardHighlighted = cardHighlighted,
+                            staffPlaybackHighlight = staffPlaybackHighlight,
+                            onClick = {
+                                selectedTrackIndex = idx
+                                if (playing) {
+                                    resetPlayback()
+                                    startPlayback()
+                                }
+                            },
+                            modifier =
+                                Modifier
+                                    .width(maxWidth * 0.4f)
+                                    .wrapContentHeight(),
+                            staffPreviewHeight = 128.dp,
+                            contentPadding = 18.dp,
+                        )
                     }
                 }
             }
@@ -351,8 +342,8 @@ fun AccentShiftPracticeScreen(
                         drawerContainerColor = Color(0xFF1B1630),
                         drawerContentColor = Color.White,
                         drawerTonalElevation = 0.dp,
-                        drawerShape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp),
-                        modifier = Modifier.fillMaxWidth(0.7f).fillMaxHeight(),
+                        drawerShape = RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp),
+                        modifier = Modifier.fillMaxWidth(0.3f).fillMaxHeight(),
                     ) {
                         AccentShiftPracticeSettingsContent(
                             config = draftConfig,
