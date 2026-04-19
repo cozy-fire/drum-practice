@@ -1,6 +1,7 @@
 package com.drumpractise.app.metronome
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -24,6 +26,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -69,6 +72,8 @@ import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.platform.PostNotificationsPermissionEffect
 import com.drumpractise.app.score.components.BpmEditDialog
+import com.drumpractise.app.score.components.ActionButton
+import com.drumpractise.app.score.components.ActionButtonStyle
 import com.drumpractise.app.settings.AppSettings
 import com.drumpractise.app.theme.DrumAccentBeat
 import drumhero.composeapp.generated.resources.Res
@@ -85,6 +90,9 @@ import kotlin.math.roundToInt
 
 private const val BPM_DIAL_COMMIT_DEBOUNCE_MS = 500L
 
+/** 设为 `true` 可恢复右侧「音色」选择 UI（默认隐藏，逻辑仍使用 [MetronomeSoundPreset.Tr707]）。 */
+private const val SHOW_METRONOME_SOUND_PRESET_UI = false
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MetronomeScreen(
@@ -95,7 +103,8 @@ fun MetronomeScreen(
     var metronomeBackgroundEnabled by remember { mutableStateOf(AppSettings.getMetronomeBackgroundPlayEnabled()) }
     PostNotificationsPermissionEffect(request = metronomeBackgroundEnabled)
 
-    var bpm by remember { mutableIntStateOf(110) }
+    var practiceItem by remember { mutableStateOf(MetronomePracticeItem.Single) }
+    var bpm by remember { mutableIntStateOf(AppSettings.getMetronomePracticeItemBpm(MetronomePracticeItem.Single)) }
     /** 圆环拖动时的预览值；null 表示未在拖动预览，界面显示已提交 [bpm]。 */
     var dialPreviewBpm by remember { mutableStateOf<Int?>(null) }
     var commitJob by remember { mutableStateOf<Job?>(null) }
@@ -111,7 +120,7 @@ fun MetronomeScreen(
         }
     }
 
-    var noteDivisor by remember { mutableIntStateOf(1) }
+    var noteDivisor by remember { mutableIntStateOf(AppSettings.getMetronomePracticeItemNoteDivisor(MetronomePracticeItem.Single)) }
     var preset by remember { mutableStateOf(MetronomeSoundPreset.Tr707) }
     var playing by remember {
         mutableStateOf(
@@ -190,6 +199,16 @@ fun MetronomeScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 20.dp, vertical = 8.dp)
 
+        fun applyPracticeItem(item: MetronomePracticeItem) {
+            if (practiceItem == item) return
+            commitJob?.cancel()
+            commitJob = null
+            dialPreviewBpm = null
+            practiceItem = item
+            bpm = AppSettings.getMetronomePracticeItemBpm(item)
+            noteDivisor = AppSettings.getMetronomePracticeItemNoteDivisor(item)
+        }
+
         @Composable
         fun LeftColumnContent() {
             Row(
@@ -226,6 +245,7 @@ fun MetronomeScreen(
                 },
                 onRingDragEnd = {
                     commitJob?.cancel()
+                    val itemAtCommit = practiceItem
                     commitJob =
                         scope.launch {
                             delay(BPM_DIAL_COMMIT_DEBOUNCE_MS)
@@ -233,19 +253,24 @@ fun MetronomeScreen(
                             bpm = v
                             dialPreviewBpm = null
                             commitJob = null
+                            AppSettings.setMetronomePracticeItemBpm(itemAtCommit, v)
                         }
                 },
                 onBpmMinus = {
                     commitJob?.cancel()
                     commitJob = null
                     dialPreviewBpm = null
-                    bpm = (bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+                    val v = (bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+                    bpm = v
+                    AppSettings.setMetronomePracticeItemBpm(practiceItem, v)
                 },
                 onBpmPlus = {
                     commitJob?.cancel()
                     commitJob = null
                     dialPreviewBpm = null
-                    bpm = (bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+                    val v = (bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+                    bpm = v
+                    AppSettings.setMetronomePracticeItemBpm(practiceItem, v)
                 },
                 onBpmClick = {
                     commitJob?.cancel()
@@ -264,19 +289,28 @@ fun MetronomeScreen(
                 NoteChoice(
                     noteDivisor = 1,
                     selected = noteDivisor == 1,
-                    onClick = { noteDivisor = 1 },
+                    onClick = {
+                        noteDivisor = 1
+                        AppSettings.setMetronomePracticeItemNoteDivisor(practiceItem, 1)
+                    },
                 )
                 Spacer(Modifier.width(15.dp))
                 NoteChoice(
                     noteDivisor = 2,
                     selected = noteDivisor == 2,
-                    onClick = { noteDivisor = 2 },
+                    onClick = {
+                        noteDivisor = 2
+                        AppSettings.setMetronomePracticeItemNoteDivisor(practiceItem, 2)
+                    },
                 )
                 Spacer(Modifier.width(15.dp))
                 NoteChoice(
                     noteDivisor = 4,
                     selected = noteDivisor == 4,
-                    onClick = { noteDivisor = 4 },
+                    onClick = {
+                        noteDivisor = 4
+                        AppSettings.setMetronomePracticeItemNoteDivisor(practiceItem, 4)
+                    },
                 )
             }
             val period = metronomeBeatPeriod(noteDivisor)
@@ -319,22 +353,43 @@ fun MetronomeScreen(
 
         @Composable
         fun ColumnScope.RightColumnContent(playButtonModifier: Modifier = Modifier) {
-            Text("音色", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            val chipScroll = rememberScrollState()
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(chipScroll),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                MetronomeSoundPreset.entries.forEach { p ->
-                    FilterChip(
-                        selected = preset == p,
-                        onClick = { preset = p },
-                        label = { Text(presetLabel(p)) },
-                    )
+            if (SHOW_METRONOME_SOUND_PRESET_UI) {
+                Text("音色", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                val chipScroll = rememberScrollState()
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(chipScroll),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    MetronomeSoundPreset.entries.forEach { p ->
+                        FilterChip(
+                            selected = preset == p,
+                            onClick = { preset = p },
+                            label = { Text(presetLabel(p)) },
+                        )
+                    }
                 }
+                Spacer(Modifier.height(8.dp))
+            }
+            Text("练习项", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                PracticeItemSegmentButton(
+                    label = "单击",
+                    selected = practiceItem == MetronomePracticeItem.Single,
+                    onClick = { applyPracticeItem(MetronomePracticeItem.Single) },
+                    modifier = Modifier.weight(1f),
+                )
+                PracticeItemSegmentButton(
+                    label = "双击",
+                    selected = practiceItem == MetronomePracticeItem.Double,
+                    onClick = { applyPracticeItem(MetronomePracticeItem.Double) },
+                    modifier = Modifier.weight(1f),
+                )
             }
             Spacer(Modifier.weight(1f))
             PlayStopButton(
@@ -387,8 +442,10 @@ fun MetronomeScreen(
             if (v != null) {
                 commitJob?.cancel()
                 commitJob = null
-                bpm = v.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+                val coerced = v.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+                bpm = coerced
                 dialPreviewBpm = null
+                AppSettings.setMetronomePracticeItemBpm(practiceItem, coerced)
             }
         },
     )
@@ -399,6 +456,45 @@ private fun presetLabel(p: MetronomeSoundPreset): String =
     when (p) {
         MetronomeSoundPreset.Tr707 -> "TR-707"
     }
+
+@Composable
+private fun PracticeItemSegmentButton(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(18.dp)
+    val style =
+        if (selected) {
+            ActionButtonStyle.GradientPurpleBlue
+        } else {
+            ActionButtonStyle.Gray
+        }
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .heightIn(max = 58.dp)
+                .clip(shape)
+                .then(
+                    if (selected) {
+                        Modifier.border(2.dp, colors.primary.copy(alpha = 0.55f), shape)
+                    } else {
+                        Modifier
+                    },
+                ),
+    ) {
+        ActionButton(
+            text = label,
+            icon = null,
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth().height(44.dp),
+            style = style,
+        )
+    }
+}
 
 @Composable
 private fun NoteChoice(

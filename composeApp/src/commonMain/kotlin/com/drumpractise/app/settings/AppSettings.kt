@@ -3,6 +3,10 @@ package com.drumpractise.app.settings
 import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.constance.VerovioConfig
 import com.drumpractise.app.accentshift.model.AccentShiftPracticeConfig
+import com.drumpractise.app.metronome.MetronomePracticeItem
+import com.drumpractise.app.metronome.MetronomePracticePersistState
+import com.drumpractise.app.metronome.normalized
+import com.drumpractise.app.metronome.normalizeNoteDivisor
 import com.drumpractise.app.separationpractice.model.SeparationConfig
 import com.drumpractise.app.separationpractice.model.SeparationPracticeLevel
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
@@ -34,6 +38,7 @@ object AppSettings {
 
     private const val KEY_METRONOME_BACKGROUND_PLAY_ENABLED = "metronome_background_play"
     private const val KEY_METRONOME_BACKGROUND_RUNNING = "metronome_background_running"
+    private const val KEY_METRONOME_PRACTICE_STATE_JSON = "metronome_practice_state_json"
 
     private const val KEY_TABLET_WIDTH_BREAKPOINT_DP = "tablet_width_breakpoint_dp"
 
@@ -244,6 +249,61 @@ object AppSettings {
 
     fun setMetronomeBackgroundRunning(running: Boolean) {
         settings.putBoolean(KEY_METRONOME_BACKGROUND_RUNNING, running)
+    }
+
+    private fun loadMetronomePracticePersistState(): MetronomePracticePersistState {
+        val raw = settings.getStringOrNull(KEY_METRONOME_PRACTICE_STATE_JSON) ?: return MetronomePracticePersistState.default()
+        return runCatching {
+            separationJson.decodeFromString(MetronomePracticePersistState.serializer(), raw)
+        }.getOrNull()?.normalized() ?: MetronomePracticePersistState.default()
+    }
+
+    private fun saveMetronomePracticePersistState(state: MetronomePracticePersistState) {
+        val normalized = state.normalized()
+        settings.putString(
+            KEY_METRONOME_PRACTICE_STATE_JSON,
+            separationJson.encodeToString(MetronomePracticePersistState.serializer(), normalized),
+        )
+    }
+
+    fun getMetronomePracticeItemBpm(item: MetronomePracticeItem): Int {
+        val s = loadMetronomePracticePersistState()
+        return when (item) {
+            MetronomePracticeItem.Single -> s.single.bpm
+            MetronomePracticeItem.Double -> s.doubleStroke.bpm
+        }
+    }
+
+    fun setMetronomePracticeItemBpm(item: MetronomePracticeItem, bpm: Int) {
+        val coerced = bpm.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
+        val current = loadMetronomePracticePersistState()
+        val updated =
+            when (item) {
+                MetronomePracticeItem.Single -> current.copy(single = current.single.copy(bpm = coerced))
+                MetronomePracticeItem.Double -> current.copy(doubleStroke = current.doubleStroke.copy(bpm = coerced))
+            }
+        saveMetronomePracticePersistState(updated)
+    }
+
+    fun getMetronomePracticeItemNoteDivisor(item: MetronomePracticeItem): Int {
+        val s = loadMetronomePracticePersistState()
+        val raw =
+            when (item) {
+                MetronomePracticeItem.Single -> s.single.noteDivisor
+                MetronomePracticeItem.Double -> s.doubleStroke.noteDivisor
+            }
+        return normalizeNoteDivisor(raw)
+    }
+
+    fun setMetronomePracticeItemNoteDivisor(item: MetronomePracticeItem, divisor: Int) {
+        val d = normalizeNoteDivisor(divisor)
+        val current = loadMetronomePracticePersistState()
+        val updated =
+            when (item) {
+                MetronomePracticeItem.Single -> current.copy(single = current.single.copy(noteDivisor = d))
+                MetronomePracticeItem.Double -> current.copy(doubleStroke = current.doubleStroke.copy(noteDivisor = d))
+            }
+        saveMetronomePracticePersistState(updated)
     }
 
     fun getTabletWidthBreakpointDp(): Float =

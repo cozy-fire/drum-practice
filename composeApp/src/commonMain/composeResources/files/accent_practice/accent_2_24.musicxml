@@ -89,12 +89,12 @@
           </system-layout>
         </print>
       <attributes>
-        <divisions>1</divisions>
+        <divisions>2</divisions>
         <key>
           <fifths>0</fifths>
           </key>
         <time>
-          <beats>4</beats>
+          <beats>2</beats>
           <beat-type>4</beat-type>
           </time>
         <clef>
@@ -110,7 +110,7 @@
         <duration>1</duration>
         <instrument id="P1-I38" />
         <voice>1</voice>
-        <type>quarter</type>
+        <type>eighth</type>
         <stem>down</stem>
         <beam number="1">begin</beam>
         </note>
@@ -122,7 +122,7 @@
         <duration>1</duration>
         <instrument id="P1-I38" />
         <voice>1</voice>
-        <type>quarter</type>
+        <type>eighth</type>
         <stem>down</stem>
         <notations><articulations><accent /></articulations></notations><beam number="1">continue</beam>
         </note>
@@ -134,7 +134,7 @@
         <duration>1</duration>
         <instrument id="P1-I38" />
         <voice>1</voice>
-        <type>quarter</type>
+        <type>eighth</type>
         <stem>down</stem>
         <beam number="1">continue</beam>
         </note>
@@ -146,7 +146,55 @@
         <duration>1</duration>
         <instrument id="P1-I38" />
         <voice>1</voice>
-        <type>quarter</type>
+        <type>eighth</type>
+        <stem>down</stem>
+        <notations><articulations><accent /></articulations></notations><beam number="1">end</beam>
+        </note>
+      <note default-x="62.19" default-y="-20">
+        <unpitched>
+          <display-step>B</display-step>
+          <display-octave>4</display-octave>
+          </unpitched>
+        <duration>1</duration>
+        <instrument id="P1-I38" />
+        <voice>1</voice>
+        <type>eighth</type>
+        <stem>down</stem>
+        <beam number="1">begin</beam>
+        </note>
+      <note default-x="92.58" default-y="-20">
+        <unpitched>
+          <display-step>B</display-step>
+          <display-octave>4</display-octave>
+          </unpitched>
+        <duration>1</duration>
+        <instrument id="P1-I38" />
+        <voice>1</voice>
+        <type>eighth</type>
+        <stem>down</stem>
+        <notations><articulations><accent /></articulations></notations><beam number="1">continue</beam>
+        </note>
+      <note default-x="122.97" default-y="-20">
+        <unpitched>
+          <display-step>B</display-step>
+          <display-octave>4</display-octave>
+          </unpitched>
+        <duration>1</duration>
+        <instrument id="P1-I38" />
+        <voice>1</voice>
+        <type>eighth</type>
+        <stem>down</stem>
+        <beam number="1">continue</beam>
+        </note>
+      <note default-x="153.36" default-y="-20">
+        <unpitched>
+          <display-step>B</display-step>
+          <display-octave>4</display-octave>
+          </unpitched>
+        <duration>1</duration>
+        <instrument id="P1-I38" />
+        <voice>1</voice>
+        <type>eighth</type>
         <stem>down</stem>
         <notations><articulations><accent /></articulations></notations><beam number="1">end</beam>
         </note>

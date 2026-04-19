@@ -1,9 +1,7 @@
 package com.drumpractise.app.metronome
 
-import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Process
@@ -25,7 +23,7 @@ actual class MetronomeEngine actual constructor() {
     private var storedOnBeat: ((Int, MetronomeAccent) -> Unit)? = null
     private var storedConfig: MetronomeRunConfig? = null
 
-    /** Decoded mono S16 PCM at [METRONOME_PCM_SAMPLE_RATE], keyed by `R.raw` id. */
+    /** Decoded mono S16 PCM at [STREAM_PCM_SAMPLE_RATE], keyed by `R.raw` id. */
     private val pcmByRawId = ConcurrentHashMap<Int, ShortArray>()
 
     @Volatile private var pcmOutTrack: AudioTrack? = null
@@ -39,50 +37,20 @@ actual class MetronomeEngine actual constructor() {
         val noteDivisor = config.noteDivisor.coerceIn(1, 4)
         val preset = config.preset
         val period = metronomeBeatPeriod(noteDivisor)
-        val intervalSamples = METRONOME_PCM_SAMPLE_RATE * 60.0 / bpm / noteDivisor
+        val intervalSamples = STREAM_PCM_SAMPLE_RATE * 60.0 / bpm / noteDivisor
         loopFuture =
             executor.submit {
                 val ctx = drumApplicationContext()
                 ensurePcmDecodedForPreset(ctx, preset)
-                val minBytes =
-                    AudioTrack.getMinBufferSize(
-                        METRONOME_PCM_SAMPLE_RATE,
-                        AudioFormat.CHANNEL_OUT_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT,
-                    )
-                if (minBytes <= 0) return@submit
-                // 使用系统允许的最小缓冲以降低端到端延迟；过小会提高 underrun 风险（听感为偶发断音/咯噔）。
-                val bufferBytes = minBytes
-                val attrBuilder =
-                    AudioAttributes
-                        .Builder()
-                        .setUsage(AudioAttributes.USAGE_GAME)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                val attrs = attrBuilder.build()
-                val audioFormat =
-                    AudioFormat
-                        .Builder()
-                        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                        .setSampleRate(METRONOME_PCM_SAMPLE_RATE)
-                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                        .build()
-                val trackBuilder =
-                    AudioTrack
-                        .Builder()
-                        .setAudioAttributes(attrs)
-                        .setAudioFormat(audioFormat)
-                        .setBufferSizeInBytes(bufferBytes)
-                        .setTransferMode(AudioTrack.MODE_STREAM)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    trackBuilder.setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
-                }
-                val track = trackBuilder.build()
-                if (track.state != AudioTrack.STATE_INITIALIZED) {
-                    track.release()
-                    return@submit
-                }
+                val track = createStreamAudioTrack48kMono() ?: return@submit
                 pcmOutTrack = track
                 Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO)
+                val bufferBytes =
+                    AudioTrack.getMinBufferSize(
+                        STREAM_PCM_SAMPLE_RATE,
+                        AudioFormat.CHANNEL_OUT_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT,
+                    ).coerceAtLeast(0)
                 val capacityShorts = bufferBytes / PCM_BYTES_PER_MONO_FRAME
                 // 较小 chunk → 更频繁 write，便于在浅缓冲下尽快补数据；过小会增加系统调用开销。
                 val chunkSamples =
@@ -233,7 +201,7 @@ actual class MetronomeEngine actual constructor() {
         for (tier in MetronomeAccent.entries) {
             val id = rawResId(preset, tier)
             pcmByRawId.computeIfAbsent(id) {
-                RawResourceMonoPcmDecoder.decodeMonoS16Resampled(ctx, id, METRONOME_PCM_SAMPLE_RATE)
+                RawResourceMonoPcmDecoder.decodeMonoS16Resampled(ctx, id, STREAM_PCM_SAMPLE_RATE)
             }
         }
     }
@@ -246,8 +214,6 @@ actual class MetronomeEngine actual constructor() {
         }
 
     companion object {
-        private const val METRONOME_PCM_SAMPLE_RATE = 48_000
-
         private const val PCM_BYTES_PER_MONO_FRAME = 2
 
         private const val MIN_CHUNK_SAMPLES = 128

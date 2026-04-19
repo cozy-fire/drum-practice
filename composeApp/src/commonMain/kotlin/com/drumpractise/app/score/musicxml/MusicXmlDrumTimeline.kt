@@ -1,5 +1,7 @@
 package com.drumpractise.app.score.musicxml
 
+import com.drumpractise.app.util.ReadWriteLock
+
 /**
  * 打击乐谱时间线：从 MusicXML part 中解析非休止符的 unpitched 音符，支持 [backup] / [forward] / 和弦。
  * 同一起始 division 的声部会合并为一组；组内保留每个音符的 [instrumentId] 以便独立采样。
@@ -38,13 +40,19 @@ object MusicXmlDrumTimelineParser {
      * 以完整 XML 文本为键，内存占用与调用方传入的字符串生命周期相关。
      */
     private val parseCache = mutableMapOf<String, ParsedDrumScore>()
+    private val cacheLock = ReadWriteLock()
 
     fun parse(musicXml: String): ParsedDrumScore {
         val trimmed = musicXml.trim()
-        parseCache[trimmed]?.let { return it }
-        val parsed = parseWithoutCache(trimmed)
-        parseCache[trimmed] = parsed
-        return parsed
+        val cached = cacheLock.read { parseCache[trimmed] }
+        if (cached != null) return cached
+        return cacheLock.write {
+            val cachedAgain = parseCache[trimmed]
+            if (cachedAgain != null) return@write cachedAgain
+            val parsed = parseWithoutCache(trimmed)
+            parseCache[trimmed] = parsed
+            parsed
+        }
     }
 
     private fun parseWithoutCache(trimmed: String): ParsedDrumScore {

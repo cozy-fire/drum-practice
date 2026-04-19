@@ -78,15 +78,22 @@ import com.drumpractise.app.accentshift.generator.AccentShiftGenerator
 import com.drumpractise.app.accentshift.handmotion.AccentShiftHandMotionPlanner
 import com.drumpractise.app.accentshift.handmotion.HandMotionTimeline
 import com.drumpractise.app.score.musicxml.MusicXmlRepository
+import com.drumpractise.app.score.musicxml.MusicXmlDrumTimelineParser
 import com.drumpractise.app.score.MusicXmlQueueItem
 import com.drumpractise.app.score.ScorePlaybackController
 import com.drumpractise.app.score.ScorePlaybackUiState
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 import com.drumpractise.app.settings.AppSettings
+import com.drumpractise.app.practice.playPracticeCountIn
+import com.drumpractise.app.practice.components.PracticeCountInOverlay
 import drumhero.composeapp.generated.resources.Res
 import drumhero.composeapp.generated.resources.accent_static_left_up
 import kotlin.math.roundToInt
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AccentShiftPracticeScreen(
@@ -137,6 +144,17 @@ fun AccentShiftPracticeScreen(
 
     val trackItems by remember {
         derivedStateOf { AccentShiftGenerator.generate(config, shuffleNonce = shuffleNonce) }
+    }
+
+    LaunchedEffect(trackItems) {
+        val distinctPaths = trackItems.map { it.musicXmlPath }.distinct()
+        for (path in distinctPaths) {
+            val xml = MusicXmlRepository.getXml(path)
+            if (xml.isBlank()) continue
+            withContext(Dispatchers.Default) {
+                MusicXmlDrumTimelineParser.parse(xml)
+            }
+        }
     }
 
     LaunchedEffect(trackItems.size) {
@@ -199,7 +217,13 @@ fun AccentShiftPracticeScreen(
 
     val hasTracks = trackItems.isNotEmpty()
 
+    var countInBeat by remember { mutableStateOf<Int?>(null) }
+    var playbackPrepareJob by remember { mutableStateOf<Job?>(null) }
+
     fun resetPlayback() {
+        playbackPrepareJob?.cancel()
+        playbackPrepareJob = null
+        countInBeat = null
         ScorePlaybackController.stop()
     }
 
@@ -209,24 +233,39 @@ fun AccentShiftPracticeScreen(
 
     fun startPlayback() {
         if (trackItems.isEmpty()) return
-        val startIdx =
-            when (val s = ScorePlaybackController.uiState.value) {
-                is ScorePlaybackUiState.Paused -> s.resumeIndex
-                else -> selectedTrackIndex
-            }.coerceIn(0, trackItems.lastIndex)
-        ScorePlaybackController.playQueue(
-            items = trackItems.map { MusicXmlQueueItem(id = it.id, musicXmlPath = it.musicXmlPath) },
-            bpm = config.bpm,
-            loopCount = config.cardLoopCount.coerceAtLeast(1),
-            pcmSampleRate = 48_000,
-            startIndex = startIdx,
-            weakNoteVolumeScale = ACCENT_SHIFT_WEAK_VOLUME_SCALE,
-        )
+        playbackPrepareJob?.cancel()
+        playbackPrepareJob =
+            scope.launch {
+                try {
+                    playPracticeCountIn(config.bpm) { beat ->
+                        countInBeat = beat
+                    }
+                } catch (_: CancellationException) {
+                    countInBeat = null
+                    return@launch
+                } finally {
+                    countInBeat = null
+                }
+                val startIdx =
+                    when (val s = ScorePlaybackController.uiState.value) {
+                        is ScorePlaybackUiState.Paused -> s.resumeIndex
+                        else -> selectedTrackIndex
+                    }.coerceIn(0, trackItems.lastIndex)
+                ScorePlaybackController.playQueue(
+                    items = trackItems.map { MusicXmlQueueItem(id = it.id, musicXmlPath = it.musicXmlPath) },
+                    bpm = config.bpm,
+                    loopCount = config.cardLoopCount.coerceAtLeast(1),
+                    pcmSampleRate = 48_000,
+                    startIndex = startIdx,
+                    weakNoteVolumeScale = ACCENT_SHIFT_WEAK_VOLUME_SCALE,
+                )
+            }
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            resetPlayback()
+            playbackPrepareJob?.cancel()
+            ScorePlaybackController.stop()
         }
     }
 
@@ -369,7 +408,8 @@ fun AccentShiftPracticeScreen(
             },
         ) {
             CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Ltr) {
-                Scaffold(
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Scaffold(
                     modifier = modifier,
                     containerColor = AccentShiftPracticeColors.background,
                     bottomBar = {
@@ -471,6 +511,14 @@ fun AccentShiftPracticeScreen(
                     },
                 ) { innerPadding ->
                     MainColumnContent(innerPadding)
+                }
+                    countInBeat?.let { beat ->
+                        PracticeCountInOverlay(
+                            beat1To4 = beat,
+                            modifier = Modifier.fillMaxSize(),
+                            digitColor = AccentShiftPracticeColors.textPrimary,
+                        )
+                    }
                 }
             }
         }

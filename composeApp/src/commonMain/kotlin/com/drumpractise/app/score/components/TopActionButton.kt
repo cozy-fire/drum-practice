@@ -4,7 +4,10 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,17 +18,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-internal enum class TopActionButtonStyle {
+internal enum class ActionButtonStyle {
     Gray,
     GradientPurpleBlue,
 }
 
 @Composable
-internal fun TopActionButton(
+internal fun ActionButton(
     text: String,
-    icon: @Composable () -> Unit,
+    icon: (@Composable () -> Unit)?,
     onClick: () -> Unit,
-    style: TopActionButtonStyle,
+    style: ActionButtonStyle,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(18.dp)
@@ -39,7 +42,7 @@ internal fun TopActionButton(
     val noiseAlpha: Float
 
     when (style) {
-        TopActionButtonStyle.Gray -> {
+        ActionButtonStyle.Gray -> {
             baseBrush =
                 Brush.horizontalGradient(
                     colors =
@@ -55,7 +58,7 @@ internal fun TopActionButton(
             noiseAlpha = if (dark) 0.018f else 0.010f
         }
 
-        TopActionButtonStyle.GradientPurpleBlue -> {
+        ActionButtonStyle.GradientPurpleBlue -> {
             baseBrush =
                 Brush.horizontalGradient(
                     colors =
@@ -73,7 +76,7 @@ internal fun TopActionButton(
     }
 
     GlassSurface(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         shape = shape,
         baseColor = baseColor,
         baseBrush = baseBrush,
@@ -88,7 +91,9 @@ internal fun TopActionButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Box(Modifier.size(18.dp), contentAlignment = Alignment.Center) { icon() }
+            icon?.let {
+                Box(Modifier.size(18.dp), contentAlignment = Alignment.Center) { icon() }
+            }
             Text(
                 text = text,
                 color = Color.White.copy(alpha = 0.95f),

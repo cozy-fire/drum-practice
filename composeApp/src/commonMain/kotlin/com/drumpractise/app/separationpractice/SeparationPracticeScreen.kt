@@ -72,8 +72,16 @@ import com.drumpractise.app.score.ScorePlaybackUiState
 import com.drumpractise.app.score.StaffZoomStore
 import com.drumpractise.app.score.prefetchStaffPreviewSvgCache
 import com.drumpractise.app.score.components.StaffZoomAdjustBar
+import com.drumpractise.app.score.musicxml.MusicXmlDrumTimelineParser
+import com.drumpractise.app.score.musicxml.MusicXmlRepository
 import com.drumpractise.app.settings.AppSettings
+import com.drumpractise.app.practice.playPracticeCountIn
+import com.drumpractise.app.practice.components.PracticeCountInOverlay
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -135,6 +143,17 @@ fun SeparationPracticeScreen(
         }
     }
 
+    LaunchedEffect(items) {
+        val distinctPaths = items.map { it.musicXmlPath }.distinct()
+        for (path in distinctPaths) {
+            val xml = MusicXmlRepository.getXml(path)
+            if (xml.isBlank()) continue
+            withContext(Dispatchers.Default) {
+                MusicXmlDrumTimelineParser.parse(xml)
+            }
+        }
+    }
+
     val staffZoomScale by StaffZoomStore.staffZoomScale.collectAsState()
 
     val isWideLayout = LocalWindowLayoutInfo.current.isTabletWidth
@@ -150,7 +169,13 @@ fun SeparationPracticeScreen(
     val columnState = rememberLazyListState()
     val rowState = rememberLazyListState()
 
+    var countInBeat by remember { mutableStateOf<Int?>(null) }
+    var playbackPrepareJob by remember { mutableStateOf<Job?>(null) }
+
     fun resetPlayback() {
+        playbackPrepareJob?.cancel()
+        playbackPrepareJob = null
+        countInBeat = null
         ScorePlaybackController.stop()
     }
 
@@ -160,18 +185,32 @@ fun SeparationPracticeScreen(
 
     fun startPlayback() {
         if (items.isEmpty()) return
-        val startIdx =
-            when (val s = ScorePlaybackController.uiState.value) {
-                is ScorePlaybackUiState.Paused -> s.resumeIndex
-                else -> 0
-            }.coerceIn(0, items.lastIndex)
-        ScorePlaybackController.playQueue(
-            items = items.map { MusicXmlQueueItem(id = it.id, musicXmlPath = it.musicXmlPath) },
-            bpm = config.bpm,
-            loopCount = config.cardLoopCount.coerceAtLeast(1),
-            pcmSampleRate = 48_000,
-            startIndex = startIdx,
-        )
+        playbackPrepareJob?.cancel()
+        playbackPrepareJob =
+            scope.launch {
+                try {
+                    playPracticeCountIn(config.bpm) { beat ->
+                        countInBeat = beat
+                    }
+                } catch (_: CancellationException) {
+                    countInBeat = null
+                    return@launch
+                } finally {
+                    countInBeat = null
+                }
+                val startIdx =
+                    when (val s = ScorePlaybackController.uiState.value) {
+                        is ScorePlaybackUiState.Paused -> s.resumeIndex
+                        else -> 0
+                    }.coerceIn(0, items.lastIndex)
+                ScorePlaybackController.playQueue(
+                    items = items.map { MusicXmlQueueItem(id = it.id, musicXmlPath = it.musicXmlPath) },
+                    bpm = config.bpm,
+                    loopCount = config.cardLoopCount.coerceAtLeast(1),
+                    pcmSampleRate = 48_000,
+                    startIndex = startIdx,
+                )
+            }
     }
 
     fun switchLevel(newLevel: SeparationPracticeLevel) {
@@ -213,7 +252,8 @@ fun SeparationPracticeScreen(
 
     DisposableEffect(Unit) {
         onDispose {
-            resetPlayback()
+            playbackPrepareJob?.cancel()
+            ScorePlaybackController.stop()
         }
     }
 
@@ -265,7 +305,8 @@ fun SeparationPracticeScreen(
             },
         ) {
             CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides LayoutDirection.Ltr) {
-                Scaffold(
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Scaffold(
                     modifier = modifier,
                     topBar = {
                         TopAppBar(
@@ -435,6 +476,13 @@ fun SeparationPracticeScreen(
                                 }
                             }
                         }
+                    }
+                }
+                    countInBeat?.let { beat ->
+                        PracticeCountInOverlay(
+                            beat1To4 = beat,
+                            modifier = Modifier.fillMaxSize(),
+                        )
                     }
                 }
             }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
@@ -48,8 +49,8 @@ import com.drumpractise.app.score.components.MusicXmlScoreTopBar
 import com.drumpractise.app.score.components.RhythmicPracticeCard
 import com.drumpractise.app.score.components.ScorePlaybackPart
 import com.drumpractise.app.score.components.StaffZoomAdjustBar
-import com.drumpractise.app.score.components.TopActionButton
-import com.drumpractise.app.score.components.TopActionButtonStyle
+import com.drumpractise.app.score.components.ActionButton
+import com.drumpractise.app.score.components.ActionButtonStyle
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 
@@ -98,6 +99,9 @@ fun RandomPractiseScreenContent(
     var zoomIndex by remember { mutableIntStateOf(initialZoomIndex.coerceIn(0, VerovioConfig.ZOOM_STEPS.lastIndex)) }
     val zoomScale = VerovioConfig.ZOOM_STEPS[zoomIndex]
     var showZoomSetupBar by remember { mutableStateOf(!AppSettings.getStaffZoomConfigured()) }
+
+    val isTableWidth = LocalWindowLayoutInfo.current.isTabletWidth
+    val windowWidth = LocalWindowLayoutInfo.current.windowWidth
 
     LaunchedEffect(showZoomSetupBar, zoomScale) {
         if (showZoomSetupBar) {
@@ -231,17 +235,21 @@ fun RandomPractiseScreenContent(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Row(
-                modifier = Modifier.wrapContentWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TopActionButton(
+                ActionButton(
                     text = "收藏组合",
                     icon = { Icon(Icons.Outlined.Bookmark, contentDescription = null) },
                     onClick = {},
-                    modifier = Modifier.wrapContentWidth().height(44.dp),
-                    style = TopActionButtonStyle.Gray,
+                    modifier = if (isTableWidth) {
+                        Modifier.width(windowWidth * 0.2f)
+                    } else {
+                        Modifier.weight(1f)
+                    }.height(44.dp),
+                    style = ActionButtonStyle.Gray,
                 )
-                TopActionButton(
+                ActionButton(
                     text = "随机组合",
                     icon = { Icon(Icons.Filled.Refresh, contentDescription = null) },
                     onClick = {
@@ -249,8 +257,12 @@ fun RandomPractiseScreenContent(
                             selection = RandomPracticeComposer.composeRandom(exclude = selection)
                         }
                     },
-                    modifier = Modifier.wrapContentWidth().height(44.dp),
-                    style = TopActionButtonStyle.GradientPurpleBlue,
+                    modifier = if (isTableWidth) {
+                        Modifier.width(windowWidth * 0.2f)
+                    } else {
+                        Modifier.weight(1f)
+                    }.height(44.dp),
+                    style = ActionButtonStyle.GradientPurpleBlue,
                 )
             }
 
@@ -259,7 +271,7 @@ fun RandomPractiseScreenContent(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                     item {
-                        BoxWithConstraints(Modifier.fillMaxWidth()) {
+                        Box(modifier = Modifier.fillMaxWidth()) {
                             val wide = LocalWindowLayoutInfo.current.isTabletWidth
                             if (!wide) {
                                 Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
