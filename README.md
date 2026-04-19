@@ -3,7 +3,7 @@
 
 Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：Android、Desktop（JVM）；IOS暂不支持。
 
-下载：[Download](https://github.com/cozy-fire/drum-practice/releases/tag/v1.0.0)
+下载：[Download](https://github.com/cozy-fire/drum-practice/releases/tag/v1.0.1)
 
 ## 功能介绍（按工作台顺序）
 
@@ -33,8 +33,8 @@ Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：An
 
 |  | 功能说明 |
 |---|---|
-| <img src="introduce/separation_practise_basic.jpg" width="360" alt="手脚分家（基础）" /><br/><img src="introduce/separation_practise_basic_setting.jpg" width="360" alt="手脚分家（基础）设置" /> | 基础模式：八分音符点位练习 |
-| <img src="introduce/separation_practise_advance.jpg" width="360" alt="手脚分家（进阶）" /><br/><img src="introduce/separation_practise_advance_setting.jpg" width="360" alt="手脚分家（进阶）设置" /> | 进阶模式：十六分音符点位练习 |
+| <table><tr><td><img src="introduce/separation_practise_basic.jpg" width="320" alt="手脚分家（基础）" /></td><td><img src="introduce/separation_practise_basic_setting.jpg" width="320" alt="手脚分家（基础）设置" /></td></tr></table> | 基础模式：八分音符点位练习 |
+| <table><tr><td><img src="introduce/separation_practise_advance.jpg" width="320" alt="手脚分家（进阶）" /></td><td><img src="introduce/separation_practise_advance_setting.jpg" width="320" alt="手脚分家（进阶）设置" /></td></tr></table> | 进阶模式：十六分音符点位练习 |
 
 ### 4) 重音移位练习
 
@@ -42,7 +42,7 @@ Kotlin Multiplatform + Compose Multiplatform 的离线鼓练习工具骨架：An
 
 |  | 功能说明 |
 |---|---|
-| <img src="introduce/accent_practise.jpg" width="360" alt="重音移位练习" /><br/><img src="introduce/accent_practise_setting.jpg" width="360" alt="重音移位练习设置" /> | 提供 15 个重音点位分布节奏的随机/顺序练习 |
+| <table><tr><td><img src="introduce/accent_practise.jpg" width="320" alt="重音移位练习" /></td><td><img src="introduce/accent_practise_setting.jpg" width="320" alt="重音移位练习设置" /></td></tr></table> | 提供 15 个重音点位分布节奏的随机/顺序练习 |
 
 ### 5) 设置页
 
