@@ -12,6 +12,7 @@ import com.drumpractise.app.separationpractice.model.SeparationPracticeLevel
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 import com.drumpractise.app.separationpractice.model.SeparationPracticeState
 import com.russhwolf.settings.Settings
+import kotlin.random.Random
 import kotlinx.serialization.json.Json
 
 object AppSettings {
@@ -41,6 +42,8 @@ object AppSettings {
     private const val KEY_METRONOME_PRACTICE_STATE_JSON = "metronome_practice_state_json"
 
     private const val KEY_TABLET_WIDTH_BREAKPOINT_DP = "tablet_width_breakpoint_dp"
+
+    private const val KEY_LOCAL_USER_ID = "local_user_id"
 
     private val settings: Settings = Settings()
 
@@ -304,6 +307,20 @@ object AppSettings {
                 MetronomePracticeItem.Double -> current.copy(doubleStroke = current.doubleStroke.copy(noteDivisor = d))
             }
         saveMetronomePracticePersistState(updated)
+    }
+
+    fun getOrCreateLocalUserId(): String {
+        val existing = settings.getStringOrNull(KEY_LOCAL_USER_ID)?.trim().orEmpty()
+        if (existing.isNotEmpty()) return existing
+        val hex = "0123456789abcdef"
+        val newId =
+            buildString(32) {
+                repeat(32) {
+                    append(hex[Random.nextInt(hex.length)])
+                }
+            }
+        settings.putString(KEY_LOCAL_USER_ID, newId)
+        return newId
     }
 
     fun getTabletWidthBreakpointDp(): Float =

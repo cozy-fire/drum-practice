@@ -1,0 +1,11 @@
+CREATE TABLE practice_event (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  created_at INTEGER NOT NULL,
+  local_user_id TEXT NOT NULL,
+  practice_kind TEXT NOT NULL,
+  settings_json TEXT NOT NULL
+);
+
+insertPracticeEvent:
+INSERT INTO practice_event(created_at, local_user_id, practice_kind, settings_json)
+VALUES (?, ?, ?, ?);

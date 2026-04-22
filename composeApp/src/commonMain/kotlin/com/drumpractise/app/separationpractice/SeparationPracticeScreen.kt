@@ -23,10 +23,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,15 +70,18 @@ import com.drumpractise.app.score.prefetchStaffPreviewSvgCache
 import com.drumpractise.app.score.components.StaffZoomAdjustBar
 import com.drumpractise.app.score.musicxml.MusicXmlDrumTimelineParser
 import com.drumpractise.app.score.musicxml.MusicXmlRepository
+import com.drumpractise.app.analytics.PracticeAnalytics
 import com.drumpractise.app.settings.AppSettings
 import com.drumpractise.app.practice.playPracticeCountIn
 import com.drumpractise.app.practice.components.PracticeCountInOverlay
+import com.drumpractise.app.practice.components.PracticePlaybackFloatingBar
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
+import kotlin.random.Random.Default.nextInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +106,7 @@ fun SeparationPracticeScreen(
     var shuffleNonce by remember {
         mutableIntStateOf(
             if (initialState.configForCurrentLevel().mode == SeparationPracticeMode.Random) {
-                kotlin.random.Random.Default.nextInt()
+                nextInt()
             } else {
                 0
             },
@@ -209,6 +208,9 @@ fun SeparationPracticeScreen(
                     loopCount = config.cardLoopCount.coerceAtLeast(1),
                     pcmSampleRate = 48_000,
                     startIndex = startIdx,
+                    onQueueFinishedNaturally = {
+                        PracticeAnalytics.recordSeparationPracticeRound(separationState)
+                    },
                 )
             }
     }
@@ -339,47 +341,6 @@ fun SeparationPracticeScreen(
                                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
                                 }
                             },
-                            actions = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.padding(end = 8.dp),
-                                ) {
-                                    IconButton(
-                                        onClick = {
-                                            if (playing) pausePlayback() else startPlayback()
-                                        },
-                                        modifier = Modifier.size(40.dp),
-                                    ) {
-                                        Icon(
-                                            imageVector = if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                            contentDescription = if (playing) "暂停" else "播放",
-                                        )
-                                    }
-                                    IconButton(
-                                        onClick = { resetPlayback() },
-                                        modifier = Modifier.size(40.dp),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Stop,
-                                            contentDescription = "停止",
-                                        )
-                                    }
-                                    IconButton(
-                                        onClick = {
-                                            resetPlayback()
-                                            draftConfig = config
-                                            scope.launch { drawerState.open() }
-                                        },
-                                        modifier = Modifier.size(40.dp),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Settings,
-                                            contentDescription = "设置",
-                                        )
-                                    }
-                                }
-                            },
                             windowInsets = WindowInsets.statusBars,
                             colors =
                                 TopAppBarDefaults.topAppBarColors(
@@ -441,14 +402,14 @@ fun SeparationPracticeScreen(
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
-                                        text = "请在右上角设置中勾选练习点位",
+                                        text = "请在底部设置中勾选练习点位",
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
                                     )
                                 }
                             } else if (!isWideLayout) {
                                 LazyColumn(
-                                    modifier = Modifier.fillMaxSize(),
+                                    modifier = Modifier.fillMaxSize().padding(bottom = 100.dp),
                                     verticalArrangement = Arrangement.spacedBy(14.dp),
                                     state = columnState,
                                 ) {
@@ -478,6 +439,25 @@ fun SeparationPracticeScreen(
                         }
                     }
                 }
+                    PracticePlaybackFloatingBar(
+                        playing = playing,
+                        playPauseEnabled = items.isNotEmpty(),
+                        onPlayPause = {
+                            if (playing) pausePlayback() else startPlayback()
+                        },
+                        onStop = { resetPlayback() },
+                        onSettings = {
+                            resetPlayback()
+                            draftConfig = config
+                            scope.launch { drawerState.open() }
+                        },
+                        modifier =
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .windowInsetsPadding(WindowInsets.safeDrawing)
+                                .padding(horizontal = 16.dp, vertical = 10.dp)
+                                .padding(bottom = if (showZoomSetupBar) 200.dp else 0.dp),
+                    )
                     countInBeat?.let { beat ->
                         PracticeCountInOverlay(
                             beat1To4 = beat,

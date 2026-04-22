@@ -27,10 +27,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -83,9 +79,11 @@ import com.drumpractise.app.score.MusicXmlQueueItem
 import com.drumpractise.app.score.ScorePlaybackController
 import com.drumpractise.app.score.ScorePlaybackUiState
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
+import com.drumpractise.app.analytics.PracticeAnalytics
 import com.drumpractise.app.settings.AppSettings
 import com.drumpractise.app.practice.playPracticeCountIn
 import com.drumpractise.app.practice.components.PracticeCountInOverlay
+import com.drumpractise.app.practice.components.PracticePlaybackFloatingBar
 import drumhero.composeapp.generated.resources.Res
 import drumhero.composeapp.generated.resources.accent_static_left_up
 import kotlin.math.roundToInt
@@ -94,6 +92,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.random.Random.Default.nextInt
 
 @Composable
 fun AccentShiftPracticeScreen(
@@ -114,7 +113,7 @@ fun AccentShiftPracticeScreen(
     var shuffleNonce by remember {
         mutableIntStateOf(
             if (savedConfig.mode == SeparationPracticeMode.Random) {
-                kotlin.random.Random.Default.nextInt()
+                nextInt()
             } else {
                 0
             },
@@ -246,6 +245,7 @@ fun AccentShiftPracticeScreen(
                 } finally {
                     countInBeat = null
                 }
+                val wasPausedBeforePlay = ScorePlaybackController.uiState.value is ScorePlaybackUiState.Paused
                 val startIdx =
                     when (val s = ScorePlaybackController.uiState.value) {
                         is ScorePlaybackUiState.Paused -> s.resumeIndex
@@ -258,6 +258,11 @@ fun AccentShiftPracticeScreen(
                     pcmSampleRate = 48_000,
                     startIndex = startIdx,
                     weakNoteVolumeScale = ACCENT_SHIFT_WEAK_VOLUME_SCALE,
+                    onQueueFinishedNaturally = { idx ->
+                        if (idx == 0 || wasPausedBeforePlay) {
+                            PracticeAnalytics.recordAccentShiftPracticeRound(config)
+                        }
+                    },
                 )
             }
     }
@@ -302,7 +307,7 @@ fun AccentShiftPracticeScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "请在右上角设置中勾选练习档位",
+                        text = "请在底部设置中勾选练习档位",
                         color = AccentShiftPracticeColors.textMuted,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
@@ -310,7 +315,7 @@ fun AccentShiftPracticeScreen(
                 }
             } else if (!isWideLayout) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().padding(bottom = 100.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     state = columnState,
                 ) {
@@ -456,51 +461,6 @@ fun AccentShiftPracticeScreen(
                                     )
                                 }
                             },
-                            actions = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    modifier = Modifier.padding(end = 4.dp),
-                                ) {
-                                    IconButton(
-                                        onClick = {
-                                            if (playing) pausePlayback() else startPlayback()
-                                        },
-                                        enabled = hasTracks,
-                                        modifier = Modifier.size(40.dp),
-                                    ) {
-                                        Icon(
-                                            imageVector = if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                                            contentDescription = if (playing) "暂停" else "播放",
-                                            tint = AccentShiftPracticeColors.textPrimary,
-                                        )
-                                    }
-                                    IconButton(
-                                        onClick = { resetPlayback() },
-                                        modifier = Modifier.size(40.dp),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Stop,
-                                            contentDescription = "停止",
-                                            tint = AccentShiftPracticeColors.textPrimary,
-                                        )
-                                    }
-                                    IconButton(
-                                        onClick = {
-                                            resetPlayback()
-                                            draftConfig = config
-                                            scope.launch { drawerState.open() }
-                                        },
-                                        modifier = Modifier.size(40.dp),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Settings,
-                                            contentDescription = "设置",
-                                            tint = AccentShiftPracticeColors.textPrimary,
-                                        )
-                                    }
-                                }
-                            },
                             colors =
                                 TopAppBarDefaults.topAppBarColors(
                                     containerColor = MaterialTheme.colorScheme.surface,
@@ -512,6 +472,26 @@ fun AccentShiftPracticeScreen(
                 ) { innerPadding ->
                     MainColumnContent(innerPadding)
                 }
+                    PracticePlaybackFloatingBar(
+                        playing = playing,
+                        playPauseEnabled = hasTracks,
+                        onPlayPause = {
+                            if (playing) pausePlayback() else startPlayback()
+                        },
+                        onStop = { resetPlayback() },
+                        onSettings = {
+                            resetPlayback()
+                            draftConfig = config
+                            scope.launch { drawerState.open() }
+                        },
+                        iconTint = AccentShiftPracticeColors.textPrimary,
+                        modifier =
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .windowInsetsPadding(WindowInsets.safeDrawing)
+                                .padding(horizontal = 16.dp, vertical = 10.dp)
+                                .padding(bottom = if (showZoomSetupBar) 200.dp else 0.dp),
+                    )
                     countInBeat?.let { beat ->
                         PracticeCountInOverlay(
                             beat1To4 = beat,

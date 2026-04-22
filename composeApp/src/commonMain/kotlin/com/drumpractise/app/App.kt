@@ -38,6 +38,7 @@ import com.drumpractise.app.theme.AppTheme
 import com.drumpractise.app.accentshift.AccentShiftPracticeScreen
 import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.platform.WindowLayoutInfo
+import com.drumpractise.app.platform.KeepScreenOnEffect
 import com.drumpractise.app.platform.OrientationLockEffect
 import com.drumpractise.app.settings.TabletWidthBreakpointStore
 import com.drumpractise.app.workbench.WorkbenchScreen
@@ -62,6 +63,7 @@ fun App() {
             val isTabletWidth = windowWidth >= breakpointDp
 
             OrientationLockEffect(isTabletWidth = isTabletWidth)
+            KeepScreenOnEffect(enabled = true)
 
             val navController = rememberNavController()
             val backStackEntry by navController.currentBackStackEntryAsState()

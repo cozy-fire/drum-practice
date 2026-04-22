@@ -1,7 +1,9 @@
 package com.drumpractise.app.accentshift.model
 
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class AccentShiftPracticeConfig(
     /** Enabled tiers 1..4: how many beats in the bar carry an accent. */
     val points: Set<Int>,

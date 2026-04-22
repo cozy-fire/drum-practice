@@ -61,6 +61,8 @@ object ScorePlaybackController {
         startIndex: Int = 0,
         /** 非 null 时启用谱面重音与弱音倍率（仅重音移位等显式传入）。 */
         weakNoteVolumeScale: Float? = null,
+        /** Invoked when the queue runs from [startIndex] through the last item without cancel/stop. */
+        onQueueFinishedNaturally: ((startIndex: Int) -> Unit)? = null,
     ) {
         job?.cancel()
         hitSound.stopPlayback()
@@ -123,6 +125,7 @@ object ScorePlaybackController {
                     }
 
                     hitSound.stopPlayback()
+                    onQueueFinishedNaturally?.invoke(from)
                     _uiState.value = ScorePlaybackUiState.Idle
                 } catch (t: Throwable) {
                     if (t is CancellationException) throw t

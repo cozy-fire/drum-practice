@@ -32,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,7 @@ import com.drumpractise.app.randompractice.PracticeComposeItem
 import com.drumpractise.app.randompractice.RandomPracticeComposer
 import com.drumpractise.app.settings.AppSettings
 import com.drumpractise.app.score.components.BpmEditDialog
+import com.drumpractise.app.score.components.MusicXmlScoreFloatingControls
 import com.drumpractise.app.score.components.MusicXmlScoreTopBar
 import com.drumpractise.app.score.components.RhythmicPracticeCard
 import com.drumpractise.app.score.components.ScorePlaybackPart
@@ -180,27 +182,13 @@ fun RandomPractiseScreenContent(
         }
     }
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            MusicXmlScoreTopBar(
-                onBack = onBack,
-                bpm = bpm,
-                onBpmMinus = { bpm = (bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) },
-                onBpmPlus = { bpm = (bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) },
-                onOpenBpmDialog = {
-                    bpmDraft = ""
-                    bpmDialogOpen = true
-                },
-                noteDivisor = noteDivisor,
-                onNoteDivisorChange = { noteDivisor = it },
-                divisorMenuExpanded = divisorMenuExpanded,
-                onDivisorMenuExpandedChange = { divisorMenuExpanded = it },
-                playing = playing,
-                onPlayingToggle = { playing = !playing },
-            )
-        },
-        bottomBar = {
+    Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                MusicXmlScoreTopBar(onBack = onBack)
+            },
+            bottomBar = {
             if (showZoomSetupBar) {
                 Box(
                     modifier =
@@ -374,9 +362,33 @@ fun RandomPractiseScreenContent(
                         }
                     }
                     item { Spacer(Modifier.height(4.dp)) }
+                    item { Spacer(Modifier.height(120.dp)) }
                 }
-            }
         }
+    }
+
+        MusicXmlScoreFloatingControls(
+            bpm = bpm,
+            onBpmMinus = { bpm = (bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) },
+            onBpmPlus = { bpm = (bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX) },
+            onOpenBpmDialog = {
+                bpmDraft = ""
+                bpmDialogOpen = true
+            },
+            noteDivisor = noteDivisor,
+            onNoteDivisorChange = { noteDivisor = it },
+            divisorMenuExpanded = divisorMenuExpanded,
+            onDivisorMenuExpandedChange = { divisorMenuExpanded = it },
+            playing = playing,
+            onPlayingToggle = { playing = !playing },
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .padding(bottom = if (showZoomSetupBar) 200.dp else 0.dp),
+        )
+    }
 
     BpmEditDialog(
         open = bpmDialogOpen,
