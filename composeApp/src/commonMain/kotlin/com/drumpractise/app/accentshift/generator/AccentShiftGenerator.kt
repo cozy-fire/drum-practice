@@ -1,44 +1,41 @@
 package com.drumpractise.app.accentshift.generator
 
 import com.drumpractise.app.accentshift.model.AccentShiftItem
-import com.drumpractise.app.accentshift.model.AccentShiftPracticeConfig
+import com.drumpractise.app.accentshift.model.AccentShiftPracticeState
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 
 object AccentShiftGenerator {
     /**
-     * Each selected tier N includes all `accent_practice/accent_N_*.musicxml` files (whitelist).
+     * 当前单选档位 N 包含所有 `accent_practice/accent_N_*.musicxml` 文件（白名单）。
      * Random mode re-shuffles when [shuffleNonce] changes (e.g. on confirm settings).
      */
     fun generate(
-        config: AccentShiftPracticeConfig,
+        state: AccentShiftPracticeState,
         shuffleNonce: Int = 0,
     ): List<AccentShiftItem> {
-        val allowed = config.points.filter { it in 1..4 }.toSet()
-        if (allowed.isEmpty()) return emptyList()
-
-        val paths =
-            allowed
-                .flatMap { tier -> filesByTier[tier].orEmpty() }
-                .distinct()
+        val tier = state.selectedTier.coerceIn(1, 4)
+        val params = state.paramsForTier(tier)
+        val paths = filesByTier[tier].orEmpty()
+        if (paths.isEmpty()) return emptyList()
 
         val baseItems =
             paths.map { path ->
-                val tier = tierFromPath(path) ?: 1
+                val tierFromFile = tierFromPath(path) ?: tier
                 val suffix = path.substringAfterLast('_').removeSuffix(".musicxml")
                 AccentShiftItem(
                     id = path.removePrefix("accent_practice/").removeSuffix(".musicxml"),
-                    title = "$tier 个重音拍 · $suffix",
+                    title = "$tierFromFile 个重音拍 · $suffix",
                     musicXmlPath = path,
                 )
             }
 
         val ordered =
-            when (config.mode) {
+            when (params.mode) {
                 SeparationPracticeMode.Sequential -> baseItems
                 SeparationPracticeMode.Random -> baseItems.shuffled(kotlin.random.Random(shuffleNonce))
             }
 
-        val loops = config.listLoopCount.coerceAtLeast(1)
+        val loops = params.listLoopCount.coerceAtLeast(1)
         if (loops == 1) return ordered
 
         return buildList(capacity = ordered.size * loops) {

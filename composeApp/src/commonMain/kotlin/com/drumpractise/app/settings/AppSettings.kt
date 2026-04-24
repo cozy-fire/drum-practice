@@ -2,7 +2,7 @@ package com.drumpractise.app.settings
 
 import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.constance.VerovioConfig
-import com.drumpractise.app.accentshift.model.AccentShiftPracticeConfig
+import com.drumpractise.app.accentshift.model.AccentShiftPracticeState
 import com.drumpractise.app.metronome.MetronomePracticeItem
 import com.drumpractise.app.metronome.MetronomePracticePersistState
 import com.drumpractise.app.metronome.normalized
@@ -31,11 +31,7 @@ object AppSettings {
     private const val KEY_SEPARATION_BPM = "separation_bpm"
     private const val KEY_SEPARATION_MODE = "separation_mode"
 
-    private const val KEY_ACCENT_SHIFT_POINTS = "accent_shift_points"
-    private const val KEY_ACCENT_SHIFT_CARD_LOOP_COUNT = "accent_shift_card_loop_count"
-    private const val KEY_ACCENT_SHIFT_LIST_LOOP_COUNT = "accent_shift_list_loop_count"
-    private const val KEY_ACCENT_SHIFT_BPM = "accent_shift_bpm"
-    private const val KEY_ACCENT_SHIFT_MODE = "accent_shift_mode"
+    private const val KEY_ACCENT_SHIFT_STATE_JSON = "accent_shift_state_json"
 
     private const val KEY_METRONOME_BACKGROUND_PLAY_ENABLED = "metronome_background_play"
     private const val KEY_METRONOME_BACKGROUND_RUNNING = "metronome_background_running"
@@ -187,57 +183,19 @@ object AppSettings {
             bpm = config.bpm.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX),
         )
 
-    fun getAccentShiftPracticeConfig(): AccentShiftPracticeConfig {
-        val default = AccentShiftPracticeConfig.default()
-        val pointsStr = settings.getStringOrNull(KEY_ACCENT_SHIFT_POINTS)
-        val points: Set<Int> =
-            if (pointsStr.isNullOrBlank()) {
-                default.points
-            } else {
-                pointsStr
-                    .split(',')
-                    .mapNotNull { it.trim().toIntOrNull() }
-                    .filter { it in 1..4 }
-                    .toSet()
-                    .ifEmpty { default.points }
-            }
-        val cardLoopCount =
-            settings.getIntOrNull(KEY_ACCENT_SHIFT_CARD_LOOP_COUNT)?.coerceIn(1, 99)
-                ?: default.cardLoopCount
-        val listLoopCount =
-            settings.getIntOrNull(KEY_ACCENT_SHIFT_LIST_LOOP_COUNT)?.coerceIn(1, 99)
-                ?: default.listLoopCount
-        val bpm =
-            settings.getIntOrNull(KEY_ACCENT_SHIFT_BPM)?.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)
-                ?: default.bpm
-        val mode =
-            when (settings.getStringOrNull(KEY_ACCENT_SHIFT_MODE)) {
-                SeparationPracticeMode.Random.name -> SeparationPracticeMode.Random
-                SeparationPracticeMode.Sequential.name -> SeparationPracticeMode.Sequential
-                else -> default.mode
-            }
-        return AccentShiftPracticeConfig(
-            points = points,
-            cardLoopCount = cardLoopCount,
-            listLoopCount = listLoopCount,
-            bpm = bpm,
-            mode = mode,
-        )
+    fun getAccentShiftPracticeState(): AccentShiftPracticeState {
+        val raw = settings.getStringOrNull(KEY_ACCENT_SHIFT_STATE_JSON) ?: return AccentShiftPracticeState.default().normalized()
+        return runCatching {
+            separationJson.decodeFromString(AccentShiftPracticeState.serializer(), raw)
+        }.getOrNull()?.normalized() ?: AccentShiftPracticeState.default().normalized()
     }
 
-    fun setAccentShiftPracticeConfig(config: AccentShiftPracticeConfig) {
-        val c =
-            config.copy(
-                points = config.points.filter { it in 1..4 }.toSet().ifEmpty { AccentShiftPracticeConfig.default().points },
-                cardLoopCount = config.cardLoopCount.coerceIn(1, 99),
-                listLoopCount = config.listLoopCount.coerceIn(1, 99),
-                bpm = config.bpm.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX),
-            )
-        settings.putString(KEY_ACCENT_SHIFT_POINTS, c.points.sorted().joinToString(","))
-        settings.putInt(KEY_ACCENT_SHIFT_CARD_LOOP_COUNT, c.cardLoopCount)
-        settings.putInt(KEY_ACCENT_SHIFT_LIST_LOOP_COUNT, c.listLoopCount)
-        settings.putInt(KEY_ACCENT_SHIFT_BPM, c.bpm)
-        settings.putString(KEY_ACCENT_SHIFT_MODE, c.mode.name)
+    fun setAccentShiftPracticeState(state: AccentShiftPracticeState) {
+        val normalized = state.normalized()
+        settings.putString(
+            KEY_ACCENT_SHIFT_STATE_JSON,
+            separationJson.encodeToString(AccentShiftPracticeState.serializer(), normalized),
+        )
     }
 
     fun getMetronomeBackgroundPlayEnabled(): Boolean =

@@ -42,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -107,12 +106,12 @@ fun AccentShiftPracticeScreen(
             )
         }
 
-    val savedConfig = remember { AppSettings.getAccentShiftPracticeConfig() }
-    var config by remember { mutableStateOf(savedConfig) }
-    var draftConfig by remember { mutableStateOf(savedConfig) }
+    val savedState = remember { AppSettings.getAccentShiftPracticeState() }
+    var practiceState by remember { mutableStateOf(savedState) }
+    var draftState by remember { mutableStateOf(savedState) }
     var shuffleNonce by remember {
         mutableIntStateOf(
-            if (savedConfig.mode == SeparationPracticeMode.Random) {
+            if (savedState.currentParams().mode == SeparationPracticeMode.Random) {
                 nextInt()
             } else {
                 0
@@ -142,8 +141,10 @@ fun AccentShiftPracticeScreen(
     var selectedTrackIndex by remember { mutableIntStateOf(0) }
 
     val trackItems by remember {
-        derivedStateOf { AccentShiftGenerator.generate(config, shuffleNonce = shuffleNonce) }
+        derivedStateOf { AccentShiftGenerator.generate(practiceState, shuffleNonce = shuffleNonce) }
     }
+
+    val activeParams = practiceState.currentParams()
 
     LaunchedEffect(trackItems) {
         val distinctPaths = trackItems.map { it.musicXmlPath }.distinct()
@@ -162,12 +163,12 @@ fun AccentShiftPracticeScreen(
 
     // 手型 GIF 时间轴（后续与 HandImageDisplayMode / 播放进度对齐）
     var handMotionTimeline by remember { mutableStateOf(HandMotionTimeline(emptyList())) }
-    LaunchedEffect(trackItems, config.bpm, config.cardLoopCount) {
+    LaunchedEffect(trackItems, activeParams.bpm, activeParams.cardLoopCount) {
         handMotionTimeline =
             AccentShiftHandMotionPlanner.buildHandMotionTimelineForQueue(
                 items = trackItems,
-                bpm = config.bpm,
-                cardLoopCount = config.cardLoopCount,
+                bpm = activeParams.bpm,
+                cardLoopCount = activeParams.cardLoopCount,
                 loadXml = { path -> MusicXmlRepository.getXml(path) },
             )
     }
@@ -215,6 +216,7 @@ fun AccentShiftPracticeScreen(
     }
 
     val hasTracks = trackItems.isNotEmpty()
+    val listBottomPad = if (isWideLayout) 200.dp else 100.dp
 
     var countInBeat by remember { mutableStateOf<Int?>(null) }
     var playbackPrepareJob by remember { mutableStateOf<Job?>(null) }
@@ -224,6 +226,13 @@ fun AccentShiftPracticeScreen(
         playbackPrepareJob = null
         countInBeat = null
         ScorePlaybackController.stop()
+        selectedTrackIndex = 0
+        scope.launch {
+            val st = if (isWideLayout) rowState else columnState
+            if (trackItems.isNotEmpty()) {
+                st.animateScrollToItem(0)
+            }
+        }
     }
 
     fun pausePlayback() {
@@ -236,7 +245,8 @@ fun AccentShiftPracticeScreen(
         playbackPrepareJob =
             scope.launch {
                 try {
-                    playPracticeCountIn(config.bpm) { beat ->
+                    val p = practiceState.currentParams()
+                    playPracticeCountIn(p.bpm) { beat ->
                         countInBeat = beat
                     }
                 } catch (_: CancellationException) {
@@ -251,16 +261,24 @@ fun AccentShiftPracticeScreen(
                         is ScorePlaybackUiState.Paused -> s.resumeIndex
                         else -> selectedTrackIndex
                     }.coerceIn(0, trackItems.lastIndex)
+                val p = practiceState.currentParams()
                 ScorePlaybackController.playQueue(
                     items = trackItems.map { MusicXmlQueueItem(id = it.id, musicXmlPath = it.musicXmlPath) },
-                    bpm = config.bpm,
-                    loopCount = config.cardLoopCount.coerceAtLeast(1),
+                    bpm = p.bpm,
+                    loopCount = p.cardLoopCount.coerceAtLeast(1),
                     pcmSampleRate = 48_000,
                     startIndex = startIdx,
                     weakNoteVolumeScale = ACCENT_SHIFT_WEAK_VOLUME_SCALE,
                     onQueueFinishedNaturally = { idx ->
                         if (idx == 0 || wasPausedBeforePlay) {
-                            PracticeAnalytics.recordAccentShiftPracticeRound(config)
+                            PracticeAnalytics.recordAccentShiftPracticeRound(practiceState)
+                        }
+                        selectedTrackIndex = 0
+                        scope.launch {
+                            val st = if (isWideLayout) rowState else columnState
+                            if (trackItems.isNotEmpty()) {
+                                st.animateScrollToItem(0)
+                            }
                         }
                     },
                 )
@@ -294,10 +312,11 @@ fun AccentShiftPracticeScreen(
             }
             Spacer(Modifier.height(10.dp))
             AccentShiftPracticeInfo(
-                bpm = config.bpm,
-                listLoopCount = config.listLoopCount,
-                cardLoopCount = config.cardLoopCount,
-                modeLabel = config.mode.label,
+                bpm = activeParams.bpm,
+                listLoopCount = activeParams.listLoopCount,
+                cardLoopCount = activeParams.cardLoopCount,
+                modeLabel = activeParams.mode.label,
+                selectedAccentTier = practiceState.selectedTier,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(10.dp))
@@ -307,7 +326,7 @@ fun AccentShiftPracticeScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "请在底部设置中勾选练习档位",
+                        text = "暂无练习条目",
                         color = AccentShiftPracticeColors.textMuted,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
@@ -315,7 +334,7 @@ fun AccentShiftPracticeScreen(
                 }
             } else if (!isWideLayout) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(bottom = 100.dp),
+                    modifier = Modifier.fillMaxSize().padding(bottom = listBottomPad),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     state = columnState,
                 ) {
@@ -340,10 +359,16 @@ fun AccentShiftPracticeScreen(
                             contentPadding = 12.dp,
                         )
                     }
+                    item(key = "accent_footer_a") {
+                        Spacer(Modifier.fillParentMaxHeight(0.48f))
+                    }
+                    item(key = "accent_footer_b") {
+                        Spacer(Modifier.fillParentMaxHeight(0.48f))
+                    }
                 }
             } else {
                 LazyRow(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().padding(bottom = listBottomPad),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     state = rowState,
                 ) {
@@ -371,6 +396,12 @@ fun AccentShiftPracticeScreen(
                             contentPadding = 18.dp,
                         )
                     }
+                    item(key = "accent_footer_row_a") {
+                        Spacer(Modifier.fillParentMaxWidth(0.48f))
+                    }
+                    item(key = "accent_footer_row_b") {
+                        Spacer(Modifier.fillParentMaxWidth(0.48f))
+                    }
                 }
             }
         }
@@ -390,14 +421,14 @@ fun AccentShiftPracticeScreen(
                         modifier = Modifier.fillMaxWidth(if (isWideLayout) 0.3f else 0.7f).fillMaxHeight(),
                     ) {
                         AccentShiftPracticeSettingsContent(
-                            config = draftConfig,
-                            onConfigChange = { draftConfig = it },
+                            practiceState = draftState,
+                            onPracticeStateChange = { draftState = it },
                             onClose = { scope.launch { drawerState.close() } },
                             onConfirm = {
                                 resetPlayback()
-                                config = draftConfig
-                                AppSettings.setAccentShiftPracticeConfig(config)
-                                if (config.mode == SeparationPracticeMode.Random) shuffleNonce++
+                                practiceState = draftState
+                                AppSettings.setAccentShiftPracticeState(practiceState)
+                                if (practiceState.currentParams().mode == SeparationPracticeMode.Random) shuffleNonce++
                                 scope.launch {
                                     drawerState.close()
                                     val targetState = if (isWideLayout) rowState else columnState
@@ -481,7 +512,7 @@ fun AccentShiftPracticeScreen(
                         onStop = { resetPlayback() },
                         onSettings = {
                             resetPlayback()
-                            draftConfig = config
+                            draftState = practiceState
                             scope.launch { drawerState.open() }
                         },
                         iconTint = AccentShiftPracticeColors.textPrimary,

@@ -22,11 +22,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,20 +38,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.drumpractise.app.accentshift.AccentShiftPracticeColors
-import com.drumpractise.app.accentshift.model.AccentShiftPracticeConfig
+import com.drumpractise.app.accentshift.model.AccentShiftPracticeState
 import com.drumpractise.app.accentshift.util.accentBeatPatternsForTier
 import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 
 @Composable
 fun AccentShiftPracticeSettingsContent(
-    config: AccentShiftPracticeConfig,
-    onConfigChange: (AccentShiftPracticeConfig) -> Unit,
+    practiceState: AccentShiftPracticeState,
+    onPracticeStateChange: (AccentShiftPracticeState) -> Unit,
     onClose: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scroll = rememberScrollState()
+    val params = practiceState.currentParams()
     Column(
         modifier = modifier.fillMaxWidth().fillMaxHeight(),
         verticalArrangement = Arrangement.spacedBy(0.dp),
@@ -75,52 +76,81 @@ fun AccentShiftPracticeSettingsContent(
                 }
             }
 
-            SectionTitle("练习档位")
+            SectionTitle("练习档位（单选）")
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 (1..4).forEach { tier ->
-                    val checked = config.points.contains(tier)
+                    val selected = practiceState.selectedTier == tier
                     TierSelectRow(
                         tier = tier,
-                        checked = checked,
-                        onToggle = {
-                            val next = if (checked) config.points - tier else config.points + tier
-                            onConfigChange(config.copy(points = next))
-                        },
+                        selected = selected,
+                        onSelect = { onPracticeStateChange(practiceState.selectTier(tier)) },
                     )
                 }
             }
 
-            SectionTitle("列表循环次数")
+            SectionTitle("列表循环次数（当前档位）")
             StepperRow(
-                valueText = "${config.listLoopCount.coerceAtLeast(1)} 次",
-                onMinus = { onConfigChange(config.copy(listLoopCount = (config.listLoopCount - 1).coerceAtLeast(1))) },
-                onPlus = { onConfigChange(config.copy(listLoopCount = (config.listLoopCount + 1).coerceAtMost(99))) },
+                valueText = "${params.listLoopCount.coerceAtLeast(1)} 次",
+                onMinus = {
+                    onPracticeStateChange(
+                        practiceState.updateCurrentTier { it.copy(listLoopCount = (it.listLoopCount - 1).coerceAtLeast(1)) },
+                    )
+                },
+                onPlus = {
+                    onPracticeStateChange(
+                        practiceState.updateCurrentTier { it.copy(listLoopCount = (it.listLoopCount + 1).coerceAtMost(99)) },
+                    )
+                },
             )
 
-            SectionTitle("单个卡片循环次数")
+            SectionTitle("单个卡片循环次数（当前档位）")
             StepperRow(
-                valueText = "${config.cardLoopCount.coerceAtLeast(1)} 次",
-                onMinus = { onConfigChange(config.copy(cardLoopCount = (config.cardLoopCount - 1).coerceAtLeast(1))) },
-                onPlus = { onConfigChange(config.copy(cardLoopCount = (config.cardLoopCount + 1).coerceAtMost(99))) },
+                valueText = "${params.cardLoopCount.coerceAtLeast(1)} 次",
+                onMinus = {
+                    onPracticeStateChange(
+                        practiceState.updateCurrentTier { it.copy(cardLoopCount = (it.cardLoopCount - 1).coerceAtLeast(1)) },
+                    )
+                },
+                onPlus = {
+                    onPracticeStateChange(
+                        practiceState.updateCurrentTier { it.copy(cardLoopCount = (it.cardLoopCount + 1).coerceAtMost(99)) },
+                    )
+                },
             )
 
-            SectionTitle("节拍速度 (BPM)")
+            SectionTitle("节拍速度 (BPM)（当前档位）")
             StepperRow(
-                valueText = "${config.bpm.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)} BPM",
-                onMinus = { onConfigChange(config.copy(bpm = (config.bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))) },
-                onPlus = { onConfigChange(config.copy(bpm = (config.bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))) },
+                valueText = "${params.bpm.coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)} BPM",
+                onMinus = {
+                    onPracticeStateChange(
+                        practiceState.updateCurrentTier { it.copy(bpm = (it.bpm - 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)) },
+                    )
+                },
+                onPlus = {
+                    onPracticeStateChange(
+                        practiceState.updateCurrentTier { it.copy(bpm = (it.bpm + 1).coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX)) },
+                    )
+                },
             )
             Slider(
-                value = config.bpm.toFloat().coerceIn(MetronomeConst.BPM_MIN.toFloat(), MetronomeConst.BPM_MAX.toFloat()),
-                onValueChange = { onConfigChange(config.copy(bpm = it.toInt().coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))) },
+                value = params.bpm.toFloat().coerceIn(MetronomeConst.BPM_MIN.toFloat(), MetronomeConst.BPM_MAX.toFloat()),
+                onValueChange = { v ->
+                    onPracticeStateChange(
+                        practiceState.updateCurrentTier { t ->
+                            t.copy(bpm = v.toInt().coerceIn(MetronomeConst.BPM_MIN, MetronomeConst.BPM_MAX))
+                        },
+                    )
+                },
                 valueRange = MetronomeConst.BPM_MIN.toFloat()..MetronomeConst.BPM_MAX.toFloat(),
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            SectionTitle("练习模式")
+            SectionTitle("练习模式（当前档位）")
             ModeRow(
-                mode = config.mode,
-                onModeChange = { onConfigChange(config.copy(mode = it)) },
+                mode = params.mode,
+                onModeChange = { mode ->
+                    onPracticeStateChange(practiceState.updateCurrentTier { it.copy(mode = mode) })
+                },
             )
         }
 
@@ -146,8 +176,8 @@ private fun SectionTitle(text: String) {
 @Composable
 private fun TierSelectRow(
     tier: Int,
-    checked: Boolean,
-    onToggle: () -> Unit,
+    selected: Boolean,
+    onSelect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(14.dp)
@@ -158,30 +188,31 @@ private fun TierSelectRow(
             modifier
                 .fillMaxWidth()
                 .background(
-                    if (checked) AccentShiftPracticeColors.accent.copy(alpha = 0.35f) else Color.White.copy(alpha = 0.08f),
+                    if (selected) AccentShiftPracticeColors.accent.copy(alpha = 0.35f) else Color.White.copy(alpha = 0.08f),
                     shape,
                 )
                 .border(1.dp, Color.White.copy(alpha = 0.10f), shape)
+                .clickable(onClick = onSelect)
                 .padding(horizontal = 14.dp, vertical = 12.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.wrapContentWidth(),
         ) {
-            Checkbox(
-                checked = checked,
-                onCheckedChange = { onToggle() },
+            RadioButton(
+                selected = selected,
+                onClick = onSelect,
                 colors =
-                    CheckboxDefaults.colors(
-                        checkedColor = AccentShiftPracticeColors.accent,
-                        checkmarkColor = Color.White,
+                    RadioButtonDefaults.colors(
+                        selectedColor = AccentShiftPracticeColors.accent,
+                        unselectedColor = Color.White.copy(alpha = 0.5f),
                     ),
             )
             Text(
                 "$tier 个重音拍",
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
-                modifier = Modifier.clickable(onClick = onToggle),
+                modifier = Modifier.clickable(onClick = onSelect),
             )
         }
 

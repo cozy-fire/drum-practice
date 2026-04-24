@@ -2,6 +2,7 @@ package com.drumpractise.app.separationpractice
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,11 +17,10 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -165,6 +165,8 @@ fun SeparationPracticeScreen(
             else -> -1
         }
 
+    val listBottomPad = if (isWideLayout) 200.dp else 100.dp
+
     val columnState = rememberLazyListState()
     val rowState = rememberLazyListState()
 
@@ -176,6 +178,12 @@ fun SeparationPracticeScreen(
         playbackPrepareJob = null
         countInBeat = null
         ScorePlaybackController.stop()
+        scope.launch {
+            val st = if (isWideLayout) rowState else columnState
+            if (items.isNotEmpty()) {
+                st.animateScrollToItem(0)
+            }
+        }
     }
 
     fun pausePlayback() {
@@ -210,6 +218,12 @@ fun SeparationPracticeScreen(
                     startIndex = startIdx,
                     onQueueFinishedNaturally = {
                         PracticeAnalytics.recordSeparationPracticeRound(separationState)
+                        scope.launch {
+                            val st = if (isWideLayout) rowState else columnState
+                            if (items.isNotEmpty()) {
+                                st.animateScrollToItem(0)
+                            }
+                        }
                     },
                 )
             }
@@ -409,7 +423,7 @@ fun SeparationPracticeScreen(
                                 }
                             } else if (!isWideLayout) {
                                 LazyColumn(
-                                    modifier = Modifier.fillMaxSize().padding(bottom = 100.dp),
+                                    modifier = Modifier.fillMaxSize().padding(bottom = listBottomPad),
                                     verticalArrangement = Arrangement.spacedBy(14.dp),
                                     state = columnState,
                                 ) {
@@ -420,10 +434,16 @@ fun SeparationPracticeScreen(
                                             modifier = Modifier.fillMaxWidth(),
                                         )
                                     }
+                                    item(key = "sep_footer_a") {
+                                        Spacer(Modifier.fillParentMaxHeight(0.48f))
+                                    }
+                                    item(key = "sep_footer_b") {
+                                        Spacer(Modifier.fillParentMaxHeight(0.48f))
+                                    }
                                 }
                             } else {
                                 LazyRow(
-                                    modifier = Modifier.fillMaxSize(),
+                                    modifier = Modifier.fillMaxSize().padding(bottom = listBottomPad),
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     state = rowState,
                                 ) {
@@ -433,6 +453,12 @@ fun SeparationPracticeScreen(
                                             highlighted = highlightIndex == idx,
                                             modifier = Modifier.width(maxWidth * 0.4f).wrapContentHeight(),
                                         )
+                                    }
+                                    item(key = "sep_footer_row_a") {
+                                        Spacer(Modifier.fillParentMaxWidth(0.48f))
+                                    }
+                                    item(key = "sep_footer_row_b") {
+                                        Spacer(Modifier.fillParentMaxWidth(0.48f))
                                     }
                                 }
                             }

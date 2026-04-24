@@ -18,6 +18,7 @@ fun AccentShiftPracticeInfo(
     listLoopCount: Int,
     cardLoopCount: Int,
     modeLabel: String,
+    selectedAccentTier: Int,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(
@@ -25,6 +26,7 @@ fun AccentShiftPracticeInfo(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        InfoPill(text = "${selectedAccentTier.coerceIn(1, 4)} 个重音拍档位")
         InfoPill(text = "$bpm BPM")
         InfoPill(text = modeLabel)
         InfoPill(text = "列表循环 $listLoopCount 次")

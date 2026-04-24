@@ -1,6 +1,6 @@
 package com.drumpractise.app.analytics
 
-import com.drumpractise.app.accentshift.model.AccentShiftPracticeConfig
+import com.drumpractise.app.accentshift.model.AccentShiftPracticeState
 import com.drumpractise.app.data.openDrumDatabase
 import com.drumpractise.app.platform.currentEpochMillis
 import com.drumpractise.app.separationpractice.model.SeparationPracticeState
@@ -26,8 +26,8 @@ object PracticeAnalytics {
         insert(PracticeKind.SEPARATION, settingsJson)
     }
 
-    fun recordAccentShiftPracticeRound(config: AccentShiftPracticeConfig) {
-        val settingsJson = json.encodeToString(AccentShiftPracticeConfig.serializer(), config)
+    fun recordAccentShiftPracticeRound(state: AccentShiftPracticeState) {
+        val settingsJson = json.encodeToString(AccentShiftPracticeState.serializer(), state)
         insert(PracticeKind.ACCENT_SHIFT, settingsJson)
     }
 
