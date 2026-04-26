@@ -47,7 +47,7 @@ internal object StaffPreviewSvgCache {
         withContext(staffPreviewSvgRenderDispatcher) {
             val xml = musicXml.trim()
             if (xml.isEmpty()) return@withContext EMPTY_SVG
-            val scalePercent = (staffZoomScale.coerceIn(0.5f, 2.0f) * 100f).toInt().coerceIn(50, 200)
+            val scalePercent = (staffZoomScale.coerceIn(0.5f, 2.8f) * 100f).toInt().coerceIn(50, 280)
             val key = cacheKeyFor(staffPreviewCacheKey, xml, scalePercent)
             renderMutex.withLock {
                 cache.get(key)?.let { return@withContext it }

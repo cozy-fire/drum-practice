@@ -1,7 +1,7 @@
 package com.drumpractise.app.analytics
 
 import com.drumpractise.app.accentshift.model.AccentShiftPracticeState
-import com.drumpractise.app.data.openDrumDatabase
+import com.drumpractise.app.data.DrumDatabaseSingleton
 import com.drumpractise.app.platform.currentEpochMillis
 import com.drumpractise.app.separationpractice.model.SeparationPracticeState
 import com.drumpractise.app.settings.AppSettings
@@ -12,6 +12,10 @@ object PracticeKind {
     const val ACCENT_SHIFT = "ACCENT_SHIFT"
 }
 
+object PracticeEventType {
+    const val PRACTICE_ROUND_COMPLETED = "PRACTICE_ROUND_COMPLETED"
+}
+
 object PracticeAnalytics {
     private val json =
         Json {
@@ -19,25 +23,25 @@ object PracticeAnalytics {
             encodeDefaults = true
         }
 
-    private val db by lazy { openDrumDatabase() }
+    private val repo by lazy { AnalyticsRepository(DrumDatabaseSingleton.instance) }
 
     fun recordSeparationPracticeRound(state: SeparationPracticeState) {
-        val settingsJson = json.encodeToString(SeparationPracticeState.serializer(), state)
-        insert(PracticeKind.SEPARATION, settingsJson)
+        val payloadJson = json.encodeToString(SeparationPracticeState.serializer(), state)
+        insert(PracticeKind.SEPARATION, "SeparationPracticeState@v1", payloadJson)
     }
 
     fun recordAccentShiftPracticeRound(state: AccentShiftPracticeState) {
-        val settingsJson = json.encodeToString(AccentShiftPracticeState.serializer(), state)
-        insert(PracticeKind.ACCENT_SHIFT, settingsJson)
+        val payloadJson = json.encodeToString(AccentShiftPracticeState.serializer(), state)
+        insert(PracticeKind.ACCENT_SHIFT, "AccentShiftPracticeState@v1", payloadJson)
     }
 
-    private fun insert(practiceKind: String, settingsJson: String) {
-        val userId = AppSettings.getOrCreateLocalUserId()
-        db.practiceEventQueries.insertPracticeEvent(
-            created_at = currentEpochMillis(),
-            local_user_id = userId,
-            practice_kind = practiceKind,
-            settings_json = settingsJson,
+    private fun insert(subject: String, payloadSchema: String, payloadJson: String) {
+        repo.appendPracticeRoundCompleted(
+            createdAt = currentEpochMillis(),
+            localUserId = AppSettings.getOrCreateLocalUserId(),
+            subject = subject,
+            payloadSchema = payloadSchema,
+            payloadJson = payloadJson,
         )
     }
 }

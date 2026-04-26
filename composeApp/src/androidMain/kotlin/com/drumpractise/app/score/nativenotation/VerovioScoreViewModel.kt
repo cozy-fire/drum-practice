@@ -30,7 +30,7 @@ class VerovioScoreViewModel : ViewModel() {
     private var viewSize by mutableStateOf(IntSize.Zero)
     private var currentPage by mutableIntStateOf(1)
     private var scaleIndex by mutableIntStateOf(3)
-    private val scaleValues = listOf(50, 60, 80, 100, 150, 200)
+    private val scaleValues = listOf(50, 60, 80, 100, 150, 200, 250, 280)
     private var selectedFont = "Leipzig"
 
     suspend fun initIfNeeded(context: Context) {

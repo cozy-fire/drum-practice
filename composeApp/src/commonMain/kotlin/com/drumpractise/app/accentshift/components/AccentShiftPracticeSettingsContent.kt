@@ -3,17 +3,14 @@ package com.drumpractise.app.accentshift.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,12 +22,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.drumpractise.app.accentshift.AccentShiftPracticeColors
 import com.drumpractise.app.accentshift.model.AccentShiftPracticeState
-import com.drumpractise.app.accentshift.util.accentBeatPatternsForTier
 import com.drumpractise.app.constance.MetronomeConst
 import com.drumpractise.app.separationpractice.model.SeparationPracticeMode
 
@@ -65,7 +58,7 @@ fun AccentShiftPracticeSettingsContent(
                     .verticalScroll(scroll),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Row(
+            androidx.compose.foundation.layout.Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -73,18 +66,6 @@ fun AccentShiftPracticeSettingsContent(
                 Text("练习设置", style = MaterialTheme.typography.titleLarge, color = Color.White)
                 IconButton(onClick = onClose) {
                     Icon(Icons.Filled.Close, contentDescription = "关闭", tint = Color.White)
-                }
-            }
-
-            SectionTitle("练习档位（单选）")
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                (1..4).forEach { tier ->
-                    val selected = practiceState.selectedTier == tier
-                    TierSelectRow(
-                        tier = tier,
-                        selected = selected,
-                        onSelect = { onPracticeStateChange(practiceState.selectTier(tier)) },
-                    )
                 }
             }
 
@@ -171,96 +152,6 @@ private fun SectionTitle(text: String) {
         fontWeight = FontWeight.SemiBold,
         color = Color.White.copy(alpha = 0.9f),
     )
-}
-
-@Composable
-private fun TierSelectRow(
-    tier: Int,
-    selected: Boolean,
-    onSelect: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val shape = RoundedCornerShape(14.dp)
-    val exampleScroll = rememberScrollState()
-    val patterns = remember(tier) { accentBeatPatternsForTier(tier) }
-    Column(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .background(
-                    if (selected) AccentShiftPracticeColors.accent.copy(alpha = 0.35f) else Color.White.copy(alpha = 0.08f),
-                    shape,
-                )
-                .border(1.dp, Color.White.copy(alpha = 0.10f), shape)
-                .clickable(onClick = onSelect)
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.wrapContentWidth(),
-        ) {
-            RadioButton(
-                selected = selected,
-                onClick = onSelect,
-                colors =
-                    RadioButtonDefaults.colors(
-                        selectedColor = AccentShiftPracticeColors.accent,
-                        unselectedColor = Color.White.copy(alpha = 0.5f),
-                    ),
-            )
-            Text(
-                "$tier 个重音拍",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White,
-                modifier = Modifier.clickable(onClick = onSelect),
-            )
-        }
-
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 6.dp)
-                    .horizontalScroll(exampleScroll),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            for (beats in patterns) {
-                AccentBeatStripMini(accentedBeats = beats)
-            }
-        }
-    }
-}
-
-@Composable
-private fun AccentBeatStripMini(
-    accentedBeats: List<Int>,
-    modifier: Modifier = Modifier,
-) {
-    val accentSet = accentedBeats.toSet()
-    Row(
-        modifier =
-            modifier
-                .height(36.dp)
-                .background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(10.dp))
-                .border(1.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(10.dp))
-                .padding(horizontal = 6.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        for (beat in 1..4) {
-            val on = beat in accentSet
-            Box(
-                modifier =
-                    Modifier
-                        .size(width = 14.dp, height = 22.dp)
-                        .background(
-                            if (on) AccentShiftPracticeColors.accent.copy(alpha = 0.85f) else Color.White.copy(alpha = 0.12f),
-                            RoundedCornerShape(4.dp),
-                        ),
-            )
-        }
-    }
 }
 
 @Composable

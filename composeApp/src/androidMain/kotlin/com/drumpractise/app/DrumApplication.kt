@@ -1,8 +1,8 @@
 package com.drumpractise.app
 
 import android.app.Application
+import com.drumpractise.app.data.DrumDatabaseSingleton
 import com.drumpractise.app.data.initDrumAndroid
-import com.drumpractise.app.data.openDrumDatabase
 import com.drumpractise.app.score.webview.VerovioWebViewPool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,7 @@ class DrumApplication : Application() {
             androidContext(this@DrumApplication)
             modules(
                 module {
-                    single { openDrumDatabase() }
+                    single { DrumDatabaseSingleton.instance }
                 },
             )
         }

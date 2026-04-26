@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.drumpractise.app.accentshift.model.AccentShiftTierSelection
 
 @Composable
 fun AccentShiftPracticeInfo(
@@ -18,7 +19,7 @@ fun AccentShiftPracticeInfo(
     listLoopCount: Int,
     cardLoopCount: Int,
     modeLabel: String,
-    selectedAccentTier: Int,
+    selectedAccentTier: AccentShiftTierSelection,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(
@@ -26,7 +27,7 @@ fun AccentShiftPracticeInfo(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        InfoPill(text = "${selectedAccentTier.coerceIn(1, 4)} 个重音拍档位")
+        InfoPill(text = selectedAccentTier.label)
         InfoPill(text = "$bpm BPM")
         InfoPill(text = modeLabel)
         InfoPill(text = "列表循环 $listLoopCount 次")

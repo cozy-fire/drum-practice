@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.score.StaffPreview
 
 @Composable
@@ -41,6 +42,10 @@ internal fun RhythmicPracticeCard(
     onToggleScorePlayback: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isTabletWidth = LocalWindowLayoutInfo.current.isTabletWidth
+    val baseStaffPreviewHeight = 128.dp
+    val effectiveStaffPreviewHeight = if (isTabletWidth) baseStaffPreviewHeight * 1.5f else baseStaffPreviewHeight
+
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(26.dp),
@@ -127,7 +132,7 @@ internal fun RhythmicPracticeCard(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .height(128.dp)
+                            .height(effectiveStaffPreviewHeight)
                             .clip(RoundedCornerShape(20.dp))
                             .background(Color(0xFFF7F7FA)),
                 ) {

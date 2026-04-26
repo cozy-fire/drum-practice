@@ -62,6 +62,8 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val isTabletWidth = LocalWindowLayoutInfo.current.isTabletWidth
+    val basePreviewHeight = 160.dp
+    val effectivePreviewHeight = if (isTabletWidth) basePreviewHeight * 1.5f else basePreviewHeight
 
     Scaffold(
         modifier = modifier,
@@ -87,8 +89,8 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             Box(
                 modifier =
                     Modifier
-                        .fillMaxWidth(if (isTabletWidth) 0.5f else 1f)
-                        .height(160.dp)
+                        .fillMaxWidth(if (isTabletWidth) 0.75f else 1f)
+                        .height(effectivePreviewHeight)
                         .background(Color(0xFFF7F7FA), RoundedCornerShape(18.dp))
                         .padding(8.dp),
             ) {

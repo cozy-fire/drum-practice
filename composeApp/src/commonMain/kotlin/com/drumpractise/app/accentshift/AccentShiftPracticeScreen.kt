@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,12 +28,15 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -59,12 +63,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.accentshift.components.AccentShiftHandImageSlot
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeCard
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeInfo
 import com.drumpractise.app.accentshift.components.AccentShiftPracticeSettingsContent
 import com.drumpractise.app.accentshift.components.HandImageDisplayMode
+import com.drumpractise.app.accentshift.model.AccentShiftTierSelection
 import com.drumpractise.app.constance.VerovioConfig
 import com.drumpractise.app.score.StaffZoomStore
 import com.drumpractise.app.score.components.StaffZoomAdjustBar
@@ -109,6 +115,7 @@ fun AccentShiftPracticeScreen(
     val savedState = remember { AppSettings.getAccentShiftPracticeState() }
     var practiceState by remember { mutableStateOf(savedState) }
     var draftState by remember { mutableStateOf(savedState) }
+    var tierMenuExpanded by remember { mutableStateOf(false) }
     var shuffleNonce by remember {
         mutableIntStateOf(
             if (savedState.currentParams().mode == SeparationPracticeMode.Random) {
@@ -193,7 +200,7 @@ fun AccentShiftPracticeScreen(
 
     LaunchedEffect(trackItems, staffZoomScale) {
         val scalePercent =
-            (staffZoomScale.coerceIn(0.5f, 2.0f) * 100f).roundToInt().coerceIn(50, 200)
+            (staffZoomScale.coerceIn(0.5f, 2.8f) * 100f).roundToInt().coerceIn(50, 280)
         prefetchStaffPreviewSvgCache(
             paths = trackItems.map { it.musicXmlPath },
             scalePercent = scalePercent,
@@ -390,17 +397,17 @@ fun AccentShiftPracticeScreen(
                             },
                             modifier =
                                 Modifier
-                                    .width(maxWidth * 0.4f)
+                                    .width(maxWidth * 0.5f)
                                     .wrapContentHeight(),
                             staffPreviewHeight = 128.dp,
                             contentPadding = 18.dp,
                         )
                     }
-                    item(key = "accent_footer_row_a") {
-                        Spacer(Modifier.fillParentMaxWidth(0.48f))
+                    item(key = "sep_footer_row_a") {
+                        Spacer(Modifier.width(maxWidth * 0.375f))
                     }
-                    item(key = "accent_footer_row_b") {
-                        Spacer(Modifier.fillParentMaxWidth(0.48f))
+                    item(key = "sep_footer_row_b") {
+                        Spacer(Modifier.width(maxWidth * 0.375f))
                     }
                 }
             }
@@ -477,11 +484,72 @@ fun AccentShiftPracticeScreen(
                     topBar = {
                         TopAppBar(
                             title = {
-                                Text(
-                                    text = "重音移位",
-                                    color = AccentShiftPracticeColors.textPrimary,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                ) {
+                                    Text(
+                                        text = "重音移位",
+                                        color = AccentShiftPracticeColors.textPrimary,
+                                        fontWeight = FontWeight.SemiBold,
+                                    )
+
+                                    Box {
+                                        Surface(
+                                            shape = RoundedCornerShape(999.dp),
+                                            color = AccentShiftPracticeColors.surfaceCardElevated,
+                                            modifier = Modifier
+                                                .clickable { tierMenuExpanded = true }
+                                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                                modifier = Modifier.padding(horizontal = 2.dp),
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.ArrowDropDown,
+                                                    contentDescription = null,
+                                                    tint = AccentShiftPracticeColors.textPrimary,
+                                                    modifier = Modifier.size(25.dp),
+                                                )
+                                                Text(
+                                                    text = practiceState.selectedTier.label,
+                                                    color = AccentShiftPracticeColors.textPrimary,
+                                                    fontSize = 24.sp,
+                                                )
+                                            }
+                                        }
+
+                                        DropdownMenu(
+                                            expanded = tierMenuExpanded,
+                                            onDismissRequest = { tierMenuExpanded = false },
+                                            properties = PopupProperties(focusable = true),
+                                        ) {
+                                            val options =
+                                                listOf(
+                                                    AccentShiftTierSelection.Tier1,
+                                                    AccentShiftTierSelection.Tier2,
+                                                    AccentShiftTierSelection.Combo12,
+                                                )
+                                            for (opt in options) {
+                                                DropdownMenuItem(
+                                                    text = { Text(opt.label) },
+                                                    onClick = {
+                                                        tierMenuExpanded = false
+                                                        if (practiceState.selectedTier == opt) return@DropdownMenuItem
+                                                        resetPlayback()
+                                                        val next = practiceState.selectTier(opt)
+                                                        practiceState = next
+                                                        draftState = next
+                                                        AppSettings.setAccentShiftPracticeState(next)
+                                                        if (next.currentParams().mode == SeparationPracticeMode.Random) shuffleNonce++
+                                                    },
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                             },
                             navigationIcon = {
                                 IconButton(onClick = onBack) {

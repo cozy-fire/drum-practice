@@ -252,7 +252,7 @@ fun SeparationPracticeScreen(
 
     LaunchedEffect(items, staffZoomScale) {
         val scalePercent =
-            (staffZoomScale.coerceIn(0.5f, 2.0f) * 100f).roundToInt().coerceIn(50, 200)
+            (staffZoomScale.coerceIn(0.5f, 2.8f) * 100f).roundToInt().coerceIn(50, 280)
         prefetchStaffPreviewSvgCache(
             paths = items.map { it.musicXmlPath },
             scalePercent = scalePercent,
@@ -451,14 +451,14 @@ fun SeparationPracticeScreen(
                                         SeparationPracticeCard(
                                             item = item,
                                             highlighted = highlightIndex == idx,
-                                            modifier = Modifier.width(maxWidth * 0.4f).wrapContentHeight(),
+                                            modifier = Modifier.width(maxWidth * 0.5f).wrapContentHeight(),
                                         )
                                     }
                                     item(key = "sep_footer_row_a") {
-                                        Spacer(Modifier.fillParentMaxWidth(0.48f))
+                                        Spacer(Modifier.width(maxWidth * 0.375f))
                                     }
                                     item(key = "sep_footer_row_b") {
-                                        Spacer(Modifier.fillParentMaxWidth(0.48f))
+                                        Spacer(Modifier.width(maxWidth * 0.375f))
                                     }
                                 }
                             }

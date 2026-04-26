@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.separationpractice.model.SeparationItem
 import com.drumpractise.app.score.StaffPreview
 import com.drumpractise.app.score.musicxml.MusicXmlRepository
@@ -34,6 +35,9 @@ fun SeparationPracticeCard(
     modifier: Modifier = Modifier,
 ) {
     var musicXml by remember(item.musicXmlPath) { mutableStateOf("") }
+    val isTabletWidth = LocalWindowLayoutInfo.current.isTabletWidth
+    val baseStaffPreviewHeight = 128.dp
+    val effectiveStaffPreviewHeight = if (isTabletWidth) baseStaffPreviewHeight * 1.5f else baseStaffPreviewHeight
 
     LaunchedEffect(item.musicXmlPath) {
         musicXml = MusicXmlRepository.getXml(item.musicXmlPath)
@@ -66,14 +70,14 @@ fun SeparationPracticeCard(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(128.dp)
+                        .height(effectiveStaffPreviewHeight)
                         .clip(RoundedCornerShape(20.dp))
                         .background(Color(0xFFF7F7FA)),
             ) {
                 StaffPreview(
                     musicXml = musicXml,
                     playbackHighlight = highlighted,
-                    modifier = Modifier.fillMaxWidth().height(128.dp),
+                    modifier = Modifier.fillMaxWidth().height(effectiveStaffPreviewHeight),
                     staffPreviewCacheKey = item.musicXmlPath,
                 )
             }

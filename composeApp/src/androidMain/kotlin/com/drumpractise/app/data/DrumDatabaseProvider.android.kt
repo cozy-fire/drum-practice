@@ -16,6 +16,6 @@ internal fun drumApplicationContext(): Context {
 }
 
 actual fun openDrumDatabase(): DrumDatabase {
-    val driver = AndroidSqliteDriver(DrumDatabase.Schema, appContext, "drum.db")
+    val driver = AndroidSqliteDriver(DrumDatabase.Schema, appContext, "drum_v2.db")
     return DrumDatabase(driver)
 }

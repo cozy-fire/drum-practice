@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.drumpractise.app.accentshift.AccentShiftPracticeColors
 import com.drumpractise.app.accentshift.model.AccentShiftItem
+import com.drumpractise.app.platform.LocalWindowLayoutInfo
 import com.drumpractise.app.score.StaffPreview
 import com.drumpractise.app.score.musicxml.MusicXmlRepository
 
@@ -45,6 +46,8 @@ fun AccentShiftPracticeCard(
     contentPadding: Dp = 18.dp,
 ) {
     var musicXml by remember(item.musicXmlPath) { mutableStateOf("") }
+    val isTabletWidth = LocalWindowLayoutInfo.current.isTabletWidth
+    val effectiveStaffPreviewHeight = if (isTabletWidth) staffPreviewHeight * 1.5f else staffPreviewHeight
 
     LaunchedEffect(item.musicXmlPath) {
         musicXml = MusicXmlRepository.getXml(item.musicXmlPath)
@@ -79,14 +82,14 @@ fun AccentShiftPracticeCard(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(staffPreviewHeight)
+                        .height(effectiveStaffPreviewHeight)
                         .clip(RoundedCornerShape(20.dp))
                         .background(Color(0xFFF7F7FA)),
             ) {
                 StaffPreview(
                     musicXml = musicXml,
                     playbackHighlight = staffPlaybackHighlight,
-                    modifier = Modifier.fillMaxWidth().height(staffPreviewHeight),
+                    modifier = Modifier.fillMaxWidth().height(effectiveStaffPreviewHeight),
                     staffPreviewCacheKey = item.musicXmlPath,
                 )
             }
